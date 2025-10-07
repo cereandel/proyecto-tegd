@@ -17,4 +17,4 @@ def add_nigga(request):
 
 def get_all_niggas(request):
     niggas = niggas_collection.find()
-    return (niggas)
+    return HttpResponse(niggas)
