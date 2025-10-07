@@ -1,1 +1,0 @@
-print('nigge'+'r'*10)
