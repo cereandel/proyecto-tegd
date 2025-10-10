@@ -1,0 +1,48 @@
+{% extends 'hotel/base.html' %} {% block title %}Reservas | StayWise{% endblock
+%} {% block content %}
+<section class="max-w-2xl mx-auto py-8">
+  <h2 class="text-3xl font-bold mb-6 text-blue-700 text-center">
+    Tus Reservas
+  </h2>
+  <div class="mb-8 bg-white rounded-lg shadow p-6">
+    {% if reservations %}
+    <ul class="divide-y divide-gray-200">
+      {% for reservation in reservations %}
+      <li class="py-4 flex justify-between items-center">
+        <span class="font-semibold">{{ reservation.hotel_name }}</span>
+        <span class="text-gray-500">{{ reservation.date }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-gray-500 text-center">No tienes reservas.</p>
+    {% endif %}
+  </div>
+  <h3 class="text-2xl font-semibold mb-4 text-blue-600">
+    Hoteles recomendados para ti
+  </h3>
+  <div class="mb-8 bg-white rounded-lg shadow p-6">
+    {% if recommendations %}
+    <ul class="divide-y divide-gray-200">
+      {% for hotel in recommendations %}
+      <li class="py-4 flex justify-between items-center">
+        <span class="font-semibold">{{ hotel.name }}</span>
+        <span class="text-gray-500">{{ hotel.location }}</span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-gray-500 text-center">
+      No hay recomendaciones disponibles en este momento.
+    </p>
+    {% endif %}
+  </div>
+  <div class="flex justify-center">
+    <a
+      href="{% url 'landing' %}"
+      class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition"
+      >Volver al inicio</a
+    >
+  </div>
+</section>
+{% endblock %}
