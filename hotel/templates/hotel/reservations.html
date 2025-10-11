@@ -1,5 +1,6 @@
-{% extends 'hotel/base.html' %} {% block title %}Reservas | StayWise{% endblock
-%} {% block content %}
+{% extends 'hotel/base.html' %} {% block title %}
+<!-- prettier-ignore NO QUITEN ESTE COMENTARIO QUE ARRUINA LA VIDA EL FORMATEO -->
+Reservas | StayWise{% endblock %} {% block content %}
 <section class="max-w-2xl mx-auto py-8">
   <h2 class="text-3xl font-bold mb-6 text-blue-700 text-center">
     Tus Reservas
@@ -39,7 +40,7 @@
   </div>
   <div class="flex justify-center">
     <a
-      href="{% url 'landing' %}"
+      href="{% url 'content' %}"
       class="bg-blue-600 text-white px-6 py-3 rounded-lg shadow hover:bg-blue-700 transition"
       >Volver al inicio</a
     >

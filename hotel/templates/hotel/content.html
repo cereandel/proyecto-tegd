@@ -1,0 +1,386 @@
+{% extends 'hotel/base.html' %} {% block content %}
+<!-- prettier-ignore NO QUITEN ESTE COMENTARIO QUE ARRUINA LA VIDA EL FORMATEO -->
+{% include "hotel/search_bar.html" %}
+
+<section class="mt-12 bg-gray-50 py-12">
+  <h2 class="text-2xl font-bold text-gray-800 mb-8 text-center">
+    ¿Por qué elegir StayWise?
+  </h2>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full px-4">
+    <div
+      class="text-center bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow duration-300"
+    >
+      <div
+        class="bg-blue-100 w-14 h-14 rounded-full flex items-center justify-center mb-3"
+      >
+        <span class="text-xl">💰</span>
+      </div>
+      <h3 class="text-base font-semibold text-gray-800 mb-2">
+        Reserva ahora, paga después
+      </h3>
+      <div class="bg-gray-100 rounded-lg p-3 mt-2">
+        <p class="text-gray-600 text-xs">
+          Cancelación gratuita en la mayoría de habitaciones
+        </p>
+      </div>
+    </div>
+
+    <div
+      class="text-center bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow duration-300"
+    >
+      <div
+        class="bg-blue-100 w-14 h-14 rounded-full flex items-center justify-center mb-3"
+      >
+        <span class="text-xl">⭐</span>
+      </div>
+      <h3 class="text-base font-semibold text-gray-800 mb-2">
+        +70 millones de reseñas
+      </h3>
+      <div class="bg-gray-100 rounded-lg p-3 mt-2">
+        <p class="text-gray-600 text-xs">
+          Información verificada de viajeros reales
+        </p>
+      </div>
+    </div>
+
+    <div
+      class="text-center bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow duration-300"
+    >
+      <div
+        class="bg-blue-100 w-14 h-14 rounded-full flex items-center justify-center mb-3"
+      >
+        <span class="text-xl">🌎</span>
+      </div>
+      <h3 class="text-base font-semibold text-gray-800 mb-2">
+        +2 millones de propiedades
+      </h3>
+      <div class="bg-gray-100 rounded-lg p-3 mt-2">
+        <p class="text-gray-600 text-xs">Hoteles, apartamentos, villas y más</p>
+      </div>
+    </div>
+
+    <div
+      class="text-center bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow duration-300"
+    >
+      <div
+        class="bg-blue-100 w-14 h-14 rounded-full flex items-center justify-center mb-3"
+      >
+        <span class="text-xl">📞</span>
+      </div>
+      <h3 class="text-base font-semibold text-gray-800 mb-2">
+        Atención al cliente 24/7
+      </h3>
+      <div class="bg-gray-100 rounded-lg p-3 mt-2">
+        <p class="text-gray-600 text-xs">Soporte técnico siempre disponible</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="mt-12">
+  <h2 class="text-2xl font-bold text-gray-800 mb-6">Ofertas especiales</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div
+      class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
+    >
+      <div class="h-40 bg-red-200 overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1582719508461-905c673771fd?ixlib=rb-4.0.1&auto=format&fit=crop&w=500&q=60"
+          alt="Oferta 1"
+          class="w-full h-full object-cover"
+        />
+      </div>
+      <div class="p-4">
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">
+          Descuento de última hora
+        </h3>
+        <p class="text-gray-600 text-sm mb-3">
+          Hasta 40% off en reservas inmediatas
+        </p>
+        <span class="text-lg font-bold text-red-600">Ahorra hasta $100</span>
+      </div>
+    </div>
+
+    <div
+      class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
+    >
+      <div class="h-40 bg-green-200 overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1564501049412-61c2a3083791?ixlib=rb-4.0.1&auto=format&fit=crop&w=500&q=60"
+          alt="Oferta 2"
+          class="w-full h-full object-cover"
+        />
+      </div>
+      <div class="p-4">
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">
+          Escapada de fin de semana
+        </h3>
+        <p class="text-gray-600 text-sm mb-3">2 noches con desayuno incluido</p>
+        <span class="text-lg font-bold text-green-600">Oferta exclusiva</span>
+      </div>
+    </div>
+
+    <div
+      class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
+    >
+      <div class="h-40 bg-blue-200 overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?ixlib=rb-4.0.1&auto=format&fit=crop&w=500&q=60"
+          alt="Oferta 3"
+          class="w-full h-full object-cover"
+        />
+      </div>
+      <div class="p-4">
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">Early Booking</h3>
+        <p class="text-gray-600 text-sm mb-3">
+          Reserva con 60 días de anticipación
+        </p>
+        <span class="text-lg font-bold text-blue-600">25% de descuento</span>
+      </div>
+    </div>
+
+    <div
+      class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
+    >
+      <div class="h-40 bg-purple-200 overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1618773928121-c32242e63f39?ixlib=rb-4.0.1&auto=format&fit=crop&w=500&q=60"
+          alt="Oferta 4"
+          class="w-full h-full object-cover"
+        />
+      </div>
+      <div class="p-4">
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">Larga estadía</h3>
+        <p class="text-gray-600 text-sm mb-3">7+ noches con beneficios extra</p>
+        <span class="text-lg font-bold text-purple-600"
+          >Descuento por volumen</span
+        >
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="mt-12">
+  <h2 class="text-2xl font-bold text-gray-800 mb-6">Destinos populares</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div
+      class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
+    >
+      <div class="h-40 bg-yellow-200 overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1539037116277-4db20889f2d4?ixlib=rb-4.0.1&auto=format&fit=crop&w=500&q=60"
+          alt="Barcelona"
+          class="w-full h-full object-cover"
+        />
+      </div>
+      <div class="p-4">
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">Barcelona</h3>
+        <p class="text-gray-600 text-sm">España • 1,245 propiedades</p>
+      </div>
+    </div>
+
+    <div
+      class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
+    >
+      <div class="h-40 bg-orange-200 overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1523531294919-4bcd7c65e216?ixlib=rb-4.0.1&auto=format&fit=crop&w=500&q=60"
+          alt="Roma"
+          class="w-full h-full object-cover"
+        />
+      </div>
+      <div class="p-4">
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">Roma</h3>
+        <p class="text-gray-600 text-sm">Italia • 987 propiedades</p>
+      </div>
+    </div>
+
+    <div
+      class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
+    >
+      <div class="h-40 bg-teal-200 overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?ixlib=rb-4.0.1&auto=format&fit=crop&w=500&q=60"
+          alt="París"
+          class="w-full h-full object-cover"
+        />
+      </div>
+      <div class="p-4">
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">París</h3>
+        <p class="text-gray-600 text-sm">Francia • 1,567 propiedades</p>
+      </div>
+    </div>
+
+    <div
+      class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
+    >
+      <div class="h-40 bg-pink-200 overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?ixlib=rb-4.0.1&auto=format&fit=crop&w=500&q=60"
+          alt="Tokio"
+          class="w-full h-full object-cover"
+        />
+      </div>
+      <div class="p-4">
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">Tokio</h3>
+        <p class="text-gray-600 text-sm">Japón • 876 propiedades</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="mt-12">
+  <h2 class="text-2xl font-bold text-gray-800 mb-6">Por tipo de propiedad</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div
+      class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
+    >
+      <div
+        class="h-32 bg-blue-100 overflow-hidden flex items-center justify-center"
+      >
+        <span class="text-4xl">🏨</span>
+      </div>
+      <div class="p-4">
+        <h3 class="text-lg font-semibold text-gray-800 mb-1">Hoteles</h3>
+        <p class="text-gray-600 text-sm">856,321 propiedades</p>
+      </div>
+    </div>
+
+    <div
+      class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
+    >
+      <div
+        class="h-32 bg-green-100 overflow-hidden flex items-center justify-center"
+      >
+        <span class="text-4xl">🏠</span>
+      </div>
+      <div class="p-4">
+        <h3 class="text-lg font-semibold text-gray-800 mb-1">Apartamentos</h3>
+        <p class="text-gray-600 text-sm">423,987 propiedades</p>
+      </div>
+    </div>
+
+    <div
+      class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
+    >
+      <div
+        class="h-32 bg-amber-100 overflow-hidden flex items-center justify-center"
+      >
+        <span class="text-4xl">🏖️</span>
+      </div>
+      <div class="p-4">
+        <h3 class="text-lg font-semibold text-gray-800 mb-1">Resorts</h3>
+        <p class="text-gray-600 text-sm">187,654 propiedades</p>
+      </div>
+    </div>
+
+    <div
+      class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
+    >
+      <div
+        class="h-32 bg-purple-100 overflow-hidden flex items-center justify-center"
+      >
+        <span class="text-4xl">🛌</span>
+      </div>
+      <div class="p-4">
+        <h3 class="text-lg font-semibold text-gray-800 mb-1">Hostales</h3>
+        <p class="text-gray-600 text-sm">98,765 propiedades</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="mt-12">
+  <h2 class="text-2xl font-bold text-gray-800 mb-6">Recomendaciones para ti</h2>
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div
+      class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
+    >
+      <div class="h-40 bg-blue-200 overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1611892440504-42a792e24d32?ixlib=rb-4.0.1&auto=format&fit=crop&w=500&q=60"
+          alt="Hotel Premium"
+          class="w-full h-full object-cover"
+        />
+      </div>
+      <div class="p-4">
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">
+          Hotel Ciudad Premium
+        </h3>
+        <p class="text-gray-600 text-sm mb-3">
+          Centro de la ciudad • WiFi gratis • Desayuno incluido
+        </p>
+        <div class="flex items-center justify-between">
+          <span class="text-xl font-bold text-blue-700"
+            >$120<span class="text-xs font-normal text-gray-500"
+              >/noche</span
+            ></span
+          >
+          <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs"
+            >⭐ 4.8</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
+    >
+      <div class="h-40 bg-green-200 overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.1&auto=format&fit=crop&w=500&q=60"
+          alt="Resort Playa"
+          class="w-full h-full object-cover"
+        />
+      </div>
+      <div class="p-4">
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">
+          Resort Playa Paradise
+        </h3>
+        <p class="text-gray-600 text-sm mb-3">
+          Vista al mar • Piscina • Todo incluido
+        </p>
+        <div class="flex items-center justify-between">
+          <span class="text-xl font-bold text-blue-700"
+            >$220<span class="text-xs font-normal text-gray-500"
+              >/noche</span
+            ></span
+          >
+          <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs"
+            >⭐ 4.9</span
+          >
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300"
+    >
+      <div class="h-40 bg-amber-200 overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?ixlib=rb-4.0.1&auto=format&fit=crop&w=500&q=60"
+          alt="Boutique Montaña"
+          class="w-full h-full object-cover"
+        />
+      </div>
+      <div class="p-4">
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">
+          Cabañas Mountain View
+        </h3>
+        <p class="text-gray-600 text-sm mb-3">Montaña • Jacuzzi • Chimenea</p>
+        <div class="flex items-center justify-between">
+          <span class="text-xl font-bold text-blue-700"
+            >$180<span class="text-xs font-normal text-gray-500"
+              >/noche</span
+            ></span
+          >
+          <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs"
+            >⭐ 4.7</span
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
