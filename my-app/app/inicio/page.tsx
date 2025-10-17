@@ -1,3 +1,5 @@
+'use client'
+import React, { useState, useEffect } from 'react'
 import { Card, CardContent } from "../ui/card";
 import { Star, MapPin } from "lucide-react";
 import {
@@ -75,7 +77,24 @@ const hotels: Hotel[] = [
     },
 ];
 
+
+
 export default function HotelCarousel() {
+
+    async function getRecommendation(){
+        const response = await fetch(`/api/recommendations`, {
+            method: "GET",
+            headers: {"Content-Type": "application/json"},
+        });
+        console.log(await response.json())
+    }
+
+    useEffect(()=>{
+        getRecommendation()
+    },[])
+
+
+
     return (
         <div className="w-full mt-10 px-4 md:px-8 lg:px-16">
             <div className="mb-8">
