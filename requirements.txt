@@ -1,4 +1,0 @@
-# Python dependencies for Django project
-Django>=4.0
-pymongo
-dotenv
