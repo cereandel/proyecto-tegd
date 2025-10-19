@@ -4,12 +4,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
-import { Checkbox } from "./ui/checkbox";
 import { useRouter } from 'next/navigation';
 import { Hotel, Mail, Lock, Eye, EyeOff } from "lucide-react";
 
 interface LoginPageProps {
-    onLogin: () => void;
+    onLogin?: () => void;
 }
 
 export default function LoginPage({ onLogin }: LoginPageProps) {
@@ -18,10 +17,46 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
     const [password, setPassword] = useState("");
     const router = useRouter();
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Simulate login
-        router.push('/inicio')
+        setLoading(true);
+        setError(null);
+
+        try {
+            const res = await fetch('/api/auth/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ email, password }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setError(data?.error || 'Login failed');
+                setLoading(false);
+                return;
+            }
+
+            if (data?.user) {
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                }
+                if (onLogin) onLogin();
+
+                router.push('pages/inicio');
+            } else {
+                setError('Invalid server response');
+            }
+        } catch (err) {
+            setError('Network error');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -97,9 +132,13 @@ export default function LoginPage({ onLogin }: LoginPageProps) {
 
                         <p className="text-center text-sm text-muted-foreground">
                             Don't have an account?{" "}
-                            <a href="/signup" className="text-primary hover:underline">
+                            <button
+                                type="button"
+                                onClick={() => router.push('pages/signup')}
+                                className="text-primary hover:underline"
+                            >
                                 Sign up
-                            </a>
+                            </button>
                         </p>
                     </form>
                 </CardContent>
