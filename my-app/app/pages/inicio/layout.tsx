@@ -155,11 +155,14 @@ export default function AppSidebar({
                                 <DropdownMenuContent side="top" className="w-[--radix-dropdown-menu-trigger-width]">
                                 <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
                                 <DropdownMenuSeparator />
-                                <DropdownMenuItem onClick={()=> {
-                                    if (typeof window !== 'undefined') {
-                                        localStorage.removeItem('user');
+                                <DropdownMenuItem onClick={async ()=> {
+                                    const response = await fetch(`/api/auth/logout`, {
+                                        method: "GET",
+                                        headers: {"Content-Type": "application/json"},
+                                    });
+                                    if(response.ok) {
+                                        router.push('/');
                                     }
-                                    router.push('/');
                                 }} >
                                     <LogOut className="w-4 h-4 mr-2"/>
                                     Log out
