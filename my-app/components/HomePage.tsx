@@ -1,0 +1,598 @@
+"use client";
+
+import { SearchBar } from "./SearchBar";
+import { HotelCarousel } from "./HotelCarousel";
+import { LocationCarousel } from "./LocationCarousel";
+import { BottomNav } from "./BottomNav";
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Plane, MapPin, Hotel, Globe, Search } from "lucide-react";
+import { useNavigation } from "../contexts/NavigationContext";
+
+interface HomePageProps {
+  onViewAllHotels?: (category: string, hotels: any[]) => void;
+  onViewAllLocations?: (locations: any[]) => void;
+  onHotelClick?: (hotel: any) => void;
+  onSearch?: (query: string) => void;
+  openSearchOnMount?: boolean;
+}
+
+export function HomePage({ onViewAllHotels, onViewAllLocations, onHotelClick, onSearch, openSearchOnMount = false }: HomePageProps) {
+  const [isSearchExpanded, setIsSearchExpanded] = useState(openSearchOnMount);
+  const [isSearching, setIsSearching] = useState(false);
+  const searchBarRef = useRef<HTMLDivElement>(null);
+  const { currentScreen } = useNavigation();
+
+  // Handle openSearchOnMount changes
+  useEffect(() => {
+    if (openSearchOnMount) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      setTimeout(() => {
+        setIsSearchExpanded(true);
+      }, 500);
+    } else {
+      setIsSearchExpanded(false);
+    }
+  }, [openSearchOnMount]);
+
+  // Scroll to top when navigating to home
+  useEffect(() => {
+    if (currentScreen === "home") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [currentScreen]);
+  const featuredHotels = [
+    {
+      id: 1,
+      name: "Grand Luxury Resort",
+      location: "Cancún, México",
+      price: "$250",
+      rating: 4.8,
+      imageUrl:
+        "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3RlbCUyMHJvb218ZW58MXx8fHwxNzYwOTUwNDI5fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 2,
+      name: "Ocean View Paradise",
+      location: "Miami Beach, USA",
+      price: "$320",
+      rating: 4.9,
+      imageUrl:
+        "https://images.unsplash.com/photo-1729605412184-8d796f9c6f66?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiZWFjaCUyMHJlc29ydCUyMGhvdGVsfGVufDF8fHx8MTc2MDg5MDI3MXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 3,
+      name: "Metropolitan Hotel",
+      location: "Ciudad de México, México",
+      price: "$180",
+      rating: 4.7,
+      imageUrl:
+        "https://images.unsplash.com/photo-1695706807850-8c66b24b3413?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBob3RlbCUyMGxvYmJ5fGVufDF8fHx8MTc2MDk3NjAwMnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 4,
+      name: "Boutique Casa Blanca",
+      location: "Barcelona, España",
+      price: "$280",
+      rating: 4.9,
+      imageUrl:
+        "https://images.unsplash.com/photo-1649731000184-7ced04998f44?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxib3V0aXF1ZSUyMGhvdGVsfGVufDF8fHx8MTc2MDg4NjQwNnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 5,
+      name: "Infinity Pool Sanctuary",
+      location: "Santorini, Grecia",
+      price: "$420",
+      rating: 4.9,
+      imageUrl:
+        "https://images.unsplash.com/photo-1744352030314-a48c8feeee2b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3RlbCUyMGluZmluaXR5JTIwcG9vbHxlbnwxfHx8fDE3NjA5Nzg0NDh8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 6,
+      name: "Luxury Suite Collection",
+      location: "París, Francia",
+      price: "$390",
+      rating: 4.8,
+      imageUrl:
+        "https://images.unsplash.com/photo-1731336478850-6bce7235e320?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3RlbCUyMGJlZHJvb218ZW58MXx8fHwxNzYwOTA5MTc3fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 7,
+      name: "Elegant Boutique Inn",
+      location: "Ámsterdam, Países Bajos",
+      price: "$270",
+      rating: 4.7,
+      imageUrl:
+        "https://images.unsplash.com/photo-1682221568203-16f33b35e57d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxib3V0aXF1ZSUyMGhvdGVsJTIwbG9iYnl8ZW58MXx8fHwxNzYwOTIwMzY4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 8,
+      name: "Coastal Villa Resort",
+      location: "Amalfi, Italia",
+      price: "$350",
+      rating: 4.9,
+      imageUrl:
+        "https://images.unsplash.com/photo-1709744873177-714d7ab0fe02?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2FzdGFsJTIwaG90ZWwlMjB2aWV3fGVufDF8fHx8MTc2MDk3ODQ1MHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+  ];
+
+  const specialOffers = [
+    {
+      id: 9,
+      name: "Tropical Paradise Resort",
+      location: "Phuket, Tailandia",
+      price: "$150",
+      rating: 4.6,
+      imageUrl:
+        "https://images.unsplash.com/photo-1697216563517-e48622ba218c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0cm9waWNhbCUyMHJlc29ydCUyMHBvb2x8ZW58MXx8fHwxNzYwOTUxNTk3fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 10,
+      name: "Urban Skyline Hotel",
+      location: "Nueva York, USA",
+      price: "$200",
+      rating: 4.8,
+      imageUrl:
+        "https://images.unsplash.com/photo-1716084380738-ea83a1c17716?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjaXR5JTIwaG90ZWwlMjBuaWdodHxlbnwxfHx8fDE3NjA5Nzc5NTR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 11,
+      name: "Mountain View Lodge",
+      location: "Aspen, Colorado",
+      price: "$220",
+      rating: 4.7,
+      imageUrl:
+        "https://images.unsplash.com/photo-1757506417384-76c0439c97ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb3VudGFpbiUyMGxvZGdlfGVufDF8fHx8MTc2MDk3Nzk1NHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 12,
+      name: "Coastal Breeze Resort",
+      location: "Maldivas",
+      price: "$350",
+      rating: 4.9,
+      imageUrl:
+        "https://images.unsplash.com/photo-1641150557653-e4c409426e59?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZXNvcnQlMjBiZWFjaCUyMGFlcmlhbHxlbnwxfHx8fDE3NjA5Nzc5NTR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 13,
+      name: "Villa Tranquila",
+      location: "Tulum, México",
+      price: "$175",
+      rating: 4.6,
+      imageUrl:
+        "https://images.unsplash.com/photo-1694967832949-09984640b143?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZXNvcnQlMjB2aWxsYXxlbnwxfHx8fDE3NjA5Nzg0NDh8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 14,
+      name: "Rooftop Urban Hotel",
+      location: "Singapur",
+      price: "$210",
+      rating: 4.7,
+      imageUrl:
+        "https://images.unsplash.com/photo-1720746942586-72083beaa07a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx1cmJhbiUyMGhvdGVsJTIwcm9vZnRvcHxlbnwxfHx8fDE3NjA5Nzg0NDl8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 15,
+      name: "Heritage Palace Hotel",
+      location: "Jaipur, India",
+      price: "$165",
+      rating: 4.5,
+      imageUrl:
+        "https://images.unsplash.com/photo-1649731000184-7ced04998f44?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxib3V0aXF1ZSUyMGhvdGVsfGVufDF8fHx8MTc2MDg4NjQwNnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 16,
+      name: "Azure Beach Club",
+      location: "Ibiza, España",
+      price: "$295",
+      rating: 4.8,
+      imageUrl:
+        "https://images.unsplash.com/photo-1729605412184-8d796f9c6f66?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiZWFjaCUyMHJlc29ydCUyMGhvdGVsfGVufDF8fHx8MTc2MDg5MDI3MXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+  ];
+
+  const popularHotels = [
+    {
+      id: 17,
+      name: "Sunset Beach Resort",
+      location: "Bali, Indonesia",
+      price: "$190",
+      rating: 4.8,
+      imageUrl:
+        "https://images.unsplash.com/photo-1729605412184-8d796f9c6f66?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiZWFjaCUyMHJlc29ydCUyMGhvdGVsfGVufDF8fHx8MTc2MDg5MDI3MXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 18,
+      name: "City Center Suites",
+      location: "Londres, Reino Unido",
+      price: "$240",
+      rating: 4.6,
+      imageUrl:
+        "https://images.unsplash.com/photo-1695706807850-8c66b24b3413?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBob3RlbCUyMGxvYmJ5fGVufDF8fHx8MTc2MDk3NjAwMnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 19,
+      name: "Royal Palace Hotel",
+      location: "Dubai, UAE",
+      price: "$380",
+      rating: 4.9,
+      imageUrl:
+        "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3RlbCUyMHJvb218ZW58MXx8fHwxNzYwOTUwNDI5fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 20,
+      name: "Alpine Retreat",
+      location: "Zermatt, Suiza",
+      price: "$300",
+      rating: 4.7,
+      imageUrl:
+        "https://images.unsplash.com/photo-1757506417384-76c0439c97ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb3VudGFpbiUyMGxvZGdlfGVufDF8fHx8MTc2MDk3Nzk1NHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 21,
+      name: "Modern Sky Tower",
+      location: "Tokio, Japón",
+      price: "$310",
+      rating: 4.8,
+      imageUrl:
+        "https://images.unsplash.com/photo-1716084380738-ea83a1c17716?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjaXR5JTIwaG90ZWwlMjBuaWdodHxlbnwxfHx8fDE3NjA5Nzc5NTR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 22,
+      name: "Prestige Oceanfront",
+      location: "Seychelles",
+      price: "$410",
+      rating: 4.9,
+      imageUrl:
+        "https://images.unsplash.com/photo-1641150557653-e4c409426e59?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZXNvcnQlMjBiZWFjaCUyMGFlcmlhbHxlbnwxfHx8fDE3NjA5Nzc5NTR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 23,
+      name: "Charming Boutique Stay",
+      location: "Praga, República Checa",
+      price: "$195",
+      rating: 4.7,
+      imageUrl:
+        "https://images.unsplash.com/photo-1682221568203-16f33b35e57d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxib3V0aXF1ZSUyMGhvdGVsJTIwbG9iYnl8ZW58MXx8fHwxNzYwOTIwMzY4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 24,
+      name: "Tropical Pool Villa",
+      location: "Koh Samui, Tailandia",
+      price: "$235",
+      rating: 4.8,
+      imageUrl:
+        "https://images.unsplash.com/photo-1697216563517-e48622ba218c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0cm9waWNhbCUyMHJlc29ydCUyMHBvb2x8ZW58MXx8fHwxNzYwOTUxNTk3fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+  ];
+
+  const popularLocations = [
+    {
+      id: 1,
+      name: "París",
+      country: "Francia",
+      hotelsCount: 342,
+      imageUrl:
+        "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwYXJpcyUyMGVpZmZlbCUyMHRvd2VyfGVufDF8fHx8MTc2MDk2NDEwNHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 2,
+      name: "Tokio",
+      country: "Japón",
+      hotelsCount: 428,
+      imageUrl:
+        "https://images.unsplash.com/photo-1602283662099-1c6c158ee94d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0b2t5byUyMGphcGFuJTIwY2l0eXxlbnwxfHx8fDE3NjA4OTQxMDJ8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 3,
+      name: "Nueva York",
+      country: "Estados Unidos",
+      hotelsCount: 567,
+      imageUrl:
+        "https://images.unsplash.com/photo-1570304816841-906a17d7b067?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxuZXclMjB5b3JrJTIwc2t5bGluZXxlbnwxfHx8fDE3NjA5NzQ0NDh8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 4,
+      name: "Dubai",
+      country: "Emiratos Árabes Unidos",
+      hotelsCount: 289,
+      imageUrl:
+        "https://images.unsplash.com/photo-1537132766573-55e8b870c5d6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkdWJhaSUyMGNpdHlzY2FwZXxlbnwxfHx8fDE3NjA5NDY1MzV8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 5,
+      name: "Roma",
+      country: "Italia",
+      hotelsCount: 391,
+      imageUrl:
+        "https://images.unsplash.com/photo-1555992828-ca4dbe41d294?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyb21lJTIwY29sb3NzZXVtfGVufDF8fHx8MTc2MDkyOTExOHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+    {
+      id: 6,
+      name: "Londres",
+      country: "Reino Unido",
+      hotelsCount: 512,
+      imageUrl:
+        "https://images.unsplash.com/photo-1745016176874-cd3ed3f5bfc6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsb25kb24lMjBiaWclMjBiZW58ZW58MXx8fHwxNzYwOTQxOTA4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+    },
+  ];
+
+  return (
+    <div className="min-h-screen bg-white pb-24">
+      {/* Header */}
+      <div
+        className="px-6 pt-12 pb-8 relative overflow-hidden"
+        style={{
+          backgroundColor: "#007AFF",
+          borderRadius: "0 0 32px 32px",
+          fontFamily: "Quicksand, Nunito, Poppins, Rounded, system-ui, sans-serif",
+        }}
+      >
+        <h1 className="text-white mb-2 text-4xl font-bold">StayWise</h1>
+        <p className="text-white/90 text-lg">Encuentra tu hotel perfecto</p>
+
+        {/* Decorative Floating Icons - Only visible when search is collapsed */}
+        {!isSearchExpanded && (
+          <div className="absolute inset-0 pointer-events-none overflow-hidden">
+            <motion.div
+              animate={{
+                x: [0, 20, 0],
+                y: [0, -15, 0],
+              }}
+              transition={{
+                duration: 4,
+                repeat: Infinity,
+                ease: "easeInOut",
+              }}
+              className="absolute top-20 right-12 opacity-20"
+            >
+              <Plane size={32} className="text-white" />
+            </motion.div>
+
+            <motion.div
+              animate={{
+                x: [0, -15, 0],
+                y: [0, 20, 0],
+              }}
+              transition={{
+                duration: 5,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 0.5,
+              }}
+              className="absolute top-32 right-28 opacity-15"
+            >
+              <Hotel size={24} className="text-white" />
+            </motion.div>
+
+            <motion.div
+              animate={{
+                x: [0, 15, 0],
+                y: [0, -10, 0],
+              }}
+              transition={{
+                duration: 6,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 1,
+              }}
+              className="absolute top-24 right-48 opacity-10"
+            >
+              <MapPin size={28} className="text-white" />
+            </motion.div>
+
+            <motion.div
+              animate={{
+                x: [0, -20, 0],
+                y: [0, 15, 0],
+              }}
+              transition={{
+                duration: 5.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 1.5,
+              }}
+              className="absolute top-16 right-64 opacity-15"
+            >
+              <Globe size={26} className="text-white" />
+            </motion.div>
+          </div>
+        )}
+
+        {/* Search Bar */}
+        <div ref={searchBarRef} className="mt-6 relative z-10">
+          <SearchBar
+            isExpanded={isSearchExpanded}
+            onExpand={() => setIsSearchExpanded(true)}
+            onCollapse={() => setIsSearchExpanded(false)}
+            onSearch={(query) => {
+              setIsSearchExpanded(false);
+              setIsSearching(true);
+              
+              // Simular búsqueda con delay
+              setTimeout(() => {
+                setIsSearching(false);
+                onSearch?.(query);
+              }, 2000);
+            }}
+          />
+        </div>
+      </div>
+
+      {/* Searching Overlay */}
+      <AnimatePresence>
+        {isSearching && (
+          <motion.div
+            className="fixed inset-0 z-50 flex items-center justify-center"
+            style={{ backgroundColor: "#007AFF" }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <motion.div
+              className="text-center"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+            >
+              {/* Animated Search Icon */}
+              <motion.div
+                className="relative mb-6"
+                animate={{ 
+                  scale: [1, 1.2, 1],
+                }}
+                transition={{ 
+                  duration: 1.5,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              >
+                <Search size={64} color="white" strokeWidth={2} />
+                
+                {/* Ripple effect */}
+                <motion.div
+                  className="absolute inset-0 rounded-full border-4 border-white"
+                  initial={{ scale: 1, opacity: 0.8 }}
+                  animate={{ 
+                    scale: [1, 1.5, 2],
+                    opacity: [0.8, 0.4, 0]
+                  }}
+                  transition={{ 
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: "easeOut"
+                  }}
+                />
+                <motion.div
+                  className="absolute inset-0 rounded-full border-4 border-white"
+                  initial={{ scale: 1, opacity: 0.8 }}
+                  animate={{ 
+                    scale: [1, 1.5, 2],
+                    opacity: [0.8, 0.4, 0]
+                  }}
+                  transition={{ 
+                    duration: 1.5,
+                    repeat: Infinity,
+                    ease: "easeOut",
+                    delay: 0.5
+                  }}
+                />
+              </motion.div>
+              
+              <motion.h2
+                className="text-white text-2xl mb-2"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                Buscando...
+              </motion.h2>
+              <motion.p
+                className="text-white/80"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+              >
+                Encontrando los mejores hoteles
+              </motion.p>
+              
+              {/* Animated dots */}
+              <motion.div className="flex justify-center gap-2 mt-4">
+                {[0, 1, 2].map((index) => (
+                  <motion.div
+                    key={index}
+                    className="w-2 h-2 rounded-full bg-white"
+                    animate={{ 
+                      y: [0, -10, 0],
+                      opacity: [0.5, 1, 0.5]
+                    }}
+                    transition={{ 
+                      duration: 0.8,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                      delay: index * 0.15
+                    }}
+                  />
+                ))}
+              </motion.div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Curated Recommendation Banner */}
+      <div className="px-6 py-6">
+        <div
+          className="p-6 relative overflow-hidden"
+          style={{
+            background: "linear-gradient(135deg, #007AFF 0%, #5AC8FA 100%)",
+            borderRadius: "24px",
+          }}
+        >
+          {/* Decorative circles */}
+          <div
+            className="absolute -right-8 -top-8 opacity-20"
+            style={{
+              width: "120px",
+              height: "120px",
+              backgroundColor: "white",
+              borderRadius: "50%",
+            }}
+          />
+          <div
+            className="absolute -left-4 -bottom-4 opacity-10"
+            style={{
+              width: "80px",
+              height: "80px",
+              backgroundColor: "white",
+              borderRadius: "50%",
+            }}
+          />
+          
+          <div className="relative z-10">
+            <h2 className="text-white mb-1 text-2xl">Te recomendamos hoy</h2>
+            <p className="text-white/90 text-sm">Contenido curado especialmente para ti</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Featured Recommendations Carousel */}
+      <HotelCarousel
+        title="Tus Recomendaciones Destacadas"
+        hotels={featuredHotels}
+        featured={true}
+        onViewAll={() => onViewAllHotels?.("Tus Recomendaciones Destacadas", featuredHotels)}
+        onHotelClick={onHotelClick}
+      />
+
+      {/* Popular Locations Carousel */}
+      <LocationCarousel
+        title="Lugares Populares"
+        locations={popularLocations}
+        onViewAll={() => onViewAllLocations?.(popularLocations)}
+      />
+
+      {/* Special Offers Carousel */}
+      <HotelCarousel 
+        title="Ofertas Especiales" 
+        hotels={specialOffers}
+        onViewAll={() => onViewAllHotels?.("Ofertas Especiales", specialOffers)}
+        onHotelClick={onHotelClick}
+      />
+
+      {/* Popular Hotels Carousel */}
+      <HotelCarousel 
+        title="Hoteles Populares" 
+        hotels={popularHotels}
+        onViewAll={() => onViewAllHotels?.("Hoteles Populares", popularHotels)}
+        onHotelClick={onHotelClick}
+      />
+
+      {/* Bottom Navigation */}
+      <BottomNav 
+        activeTab={isSearchExpanded ? "search" : "home"}
+      />
+    </div>
+  );
+}
