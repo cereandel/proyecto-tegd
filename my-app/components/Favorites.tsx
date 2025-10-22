@@ -6,6 +6,7 @@ import { BottomNav } from "./BottomNav";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigation } from "../contexts/NavigationContext";
+import { useSelectedHotel } from "../contexts/SelectedHotelContext";
 
 interface Hotel {
   id: number;
@@ -21,8 +22,9 @@ interface FavoritesProps {
 }
 
 export function Favorites({ onHotelClick }: FavoritesProps) {
-  const { navigateToHome } = useNavigation();
-  
+  const { navigateToHome, navigateToHotelDetails } = useNavigation();
+  const { setSelectedHotel } = useSelectedHotel();
+
   // Mock data for favorite hotels
   const [favorites, setFavorites] = useState<Hotel[]>([
     {
@@ -31,7 +33,8 @@ export function Favorites({ onHotelClick }: FavoritesProps) {
       location: "Cancún, México",
       price: "$250",
       rating: 4.8,
-      imageUrl: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3RlbCUyMHJvb218ZW58MXx8fHwxNzYwOTUwNDI5fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      imageUrl:
+        "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3RlbCUyMHJvb218ZW58MXx8fHwxNzYwOTUwNDI5fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     },
     {
       id: 2,
@@ -39,7 +42,8 @@ export function Favorites({ onHotelClick }: FavoritesProps) {
       location: "Miami Beach, USA",
       price: "$320",
       rating: 4.9,
-      imageUrl: "https://images.unsplash.com/photo-1729605412184-8d796f9c6f66?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiZWFjaCUyMHJlc29ydCUyMGhvdGVsfGVufDF8fHx8MTc2MDg5MDI3MXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      imageUrl:
+        "https://images.unsplash.com/photo-1729605412184-8d796f9c6f66?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiZWFjaCUyMHJlc29ydCUyMGhvdGVsfGVufDF8fHx8MTc2MDg5MDI3MXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     },
     {
       id: 4,
@@ -47,7 +51,8 @@ export function Favorites({ onHotelClick }: FavoritesProps) {
       location: "Barcelona, España",
       price: "$280",
       rating: 4.9,
-      imageUrl: "https://images.unsplash.com/photo-1649731000184-7ced04998f44?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxib3V0aXF1ZSUyMGhvdGVsfGVufDF8fHx8MTc2MDg4NjQwNnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      imageUrl:
+        "https://images.unsplash.com/photo-1649731000184-7ced04998f44?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxib3V0aXF1ZSUyMGhvdGVsfGVufDF8fHx8MTc2MDg4NjQwNnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     },
     {
       id: 5,
@@ -55,7 +60,8 @@ export function Favorites({ onHotelClick }: FavoritesProps) {
       location: "Santorini, Grecia",
       price: "$420",
       rating: 4.9,
-      imageUrl: "https://images.unsplash.com/photo-1744352030314-a48c8feeee2b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3RlbCUyMGluZmluaXR5JTIwcG9vbHxlbnwxfHx8fDE3NjA5Nzg0NDh8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      imageUrl:
+        "https://images.unsplash.com/photo-1744352030314-a48c8feeee2b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3RlbCUyMGluZmluaXR5JTIwcG9vbHxlbnwxfHx8fDE3NjA5Nzg0NDh8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     },
     {
       id: 6,
@@ -63,7 +69,8 @@ export function Favorites({ onHotelClick }: FavoritesProps) {
       location: "París, Francia",
       price: "$390",
       rating: 4.8,
-      imageUrl: "https://images.unsplash.com/photo-1731336478850-6bce7235e320?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3RlbCUyMGJlZHJvb218ZW58MXx8fHwxNzYwOTA5MTc3fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      imageUrl:
+        "https://images.unsplash.com/photo-1731336478850-6bce7235e320?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3RlbCUyMGJlZHJvb218ZW58MXx8fHwxNzYwOTA5MTc3fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     },
     {
       id: 8,
@@ -71,7 +78,8 @@ export function Favorites({ onHotelClick }: FavoritesProps) {
       location: "Amalfi, Italia",
       price: "$350",
       rating: 4.9,
-      imageUrl: "https://images.unsplash.com/photo-1709744873177-714d7ab0fe02?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2FzdGFsJTIwaG90ZWwlMjB2aWV3fGVufDF8fHx8MTc2MDk3ODQ1MHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      imageUrl:
+        "https://images.unsplash.com/photo-1709744873177-714d7ab0fe02?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2FzdGFsJTIwaG90ZWwlMjB2aWV3fGVufDF8fHx8MTc2MDk3ODQ1MHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     },
     {
       id: 10,
@@ -79,7 +87,8 @@ export function Favorites({ onHotelClick }: FavoritesProps) {
       location: "Nueva York, USA",
       price: "$200",
       rating: 4.8,
-      imageUrl: "https://images.unsplash.com/photo-1716084380738-ea83a1c17716?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjaXR5JTIwaG90ZWwlMjBuaWdodHxlbnwxfHx8fDE3NjA5Nzc5NTR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      imageUrl:
+        "https://images.unsplash.com/photo-1716084380738-ea83a1c17716?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjaXR5JTIwaG90ZWwlMjBuaWdodHxlbnwxfHx8fDE3NjA5Nzc5NTR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     },
     {
       id: 12,
@@ -87,7 +96,8 @@ export function Favorites({ onHotelClick }: FavoritesProps) {
       location: "Maldivas",
       price: "$350",
       rating: 4.9,
-      imageUrl: "https://images.unsplash.com/photo-1641150557653-e4c409426e59?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZXNvcnQlMjBiZWFjaCUyMGFlcmlhbHxlbnwxfHx8fDE3NjA5Nzc5NTR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      imageUrl:
+        "https://images.unsplash.com/photo-1641150557653-e4c409426e59?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZXNvcnQlMjBiZWFjaCUyMGFlcmlhbHxlbnwxfHx8fDE3NjA5Nzc5NTR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     },
     {
       id: 19,
@@ -95,7 +105,8 @@ export function Favorites({ onHotelClick }: FavoritesProps) {
       location: "Dubai, UAE",
       price: "$380",
       rating: 4.9,
-      imageUrl: "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3RlbCUyMHJvb218ZW58MXx8fHwxNzYwOTUwNDI5fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
+      imageUrl:
+        "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3RlbCUyMHJvb218ZW58MXx8fHwxNzYwOTUwNDI5fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     },
   ]);
 
@@ -150,7 +161,14 @@ export function Favorites({ onHotelClick }: FavoritesProps) {
                     <FavoriteCard
                       hotel={hotel}
                       onRemove={removeFavorite}
-                      onClick={() => onHotelClick?.(hotel)}
+                      onClick={() => {
+                        setSelectedHotel(hotel);
+                        if (onHotelClick) {
+                          onHotelClick(hotel);
+                        } else {
+                          navigateToHotelDetails?.(hotel.id);
+                        }
+                      }}
                     />
                   </motion.div>
                 ))}
@@ -185,9 +203,7 @@ export function Favorites({ onHotelClick }: FavoritesProps) {
       </div>
 
       {/* Bottom Navigation */}
-      <BottomNav 
-        activeTab="favorites"
-      />
+      <BottomNav activeTab="favorites" />
     </div>
   );
 }
@@ -221,7 +237,9 @@ function FavoriteCard({
         borderRadius: "20px",
         border: "1px solid #E5E7EB",
       }}
-      animate={isRemoving ? { opacity: 0, scale: 0.8 } : { opacity: 1, scale: 1 }}
+      animate={
+        isRemoving ? { opacity: 0, scale: 0.8 } : { opacity: 1, scale: 1 }
+      }
       onClick={onClick}
     >
       {/* Image */}
@@ -243,7 +261,11 @@ function FavoriteCard({
           whileTap={{ scale: 0.85 }}
         >
           <motion.div
-            animate={isHoveringHeart ? { scale: 1.1, rotate: [0, -10, 10, -10, 0] } : { scale: 1, rotate: 0 }}
+            animate={
+              isHoveringHeart
+                ? { scale: 1.1, rotate: [0, -10, 10, -10, 0] }
+                : { scale: 1, rotate: 0 }
+            }
             transition={{ duration: 0.3 }}
           >
             <AnimatePresence mode="wait">
@@ -316,10 +338,7 @@ function FavoriteCard({
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs text-gray-500">Por noche</p>
-            <p
-              className="text-lg"
-              style={{ color: "#FF2D55" }}
-            >
+            <p className="text-lg" style={{ color: "#FF2D55" }}>
               {hotel.price}
             </p>
           </div>

@@ -8,6 +8,10 @@ import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plane, MapPin, Hotel, Globe, Search } from "lucide-react";
 import { useNavigation } from "../contexts/NavigationContext";
+import { useSelectedHotel } from "../contexts/SelectedHotelContext";
+import { getMockHotels } from "../data/mocks/hotels";
+import { useViewAll } from "../contexts/ViewAllContext";
+import { useViewAllLocations } from "../contexts/ViewAllLocationsContext";
 
 interface HomePageProps {
   onViewAllHotels?: (category: string, hotels: any[]) => void;
@@ -17,30 +21,66 @@ interface HomePageProps {
   openSearchOnMount?: boolean;
 }
 
-export function HomePage({ onViewAllHotels, onViewAllLocations, onHotelClick, onSearch, openSearchOnMount = false }: HomePageProps) {
-  const [isSearchExpanded, setIsSearchExpanded] = useState(openSearchOnMount);
+export function HomePage({
+  onViewAllHotels,
+  onViewAllLocations,
+  onHotelClick,
+  onSearch,
+  openSearchOnMount: openSearchOnMountProp = false,
+}: HomePageProps) {
+  const [isSearchExpanded, setIsSearchExpanded] = useState(
+    openSearchOnMountProp
+  );
   const [isSearching, setIsSearching] = useState(false);
   const searchBarRef = useRef<HTMLDivElement>(null);
-  const { currentScreen } = useNavigation();
+  const { navigateTo, openSearchOnMount, setOpenSearchOnMount } =
+    useNavigation();
+
+  const { setSelectedHotel } = useSelectedHotel();
+  const { setViewAll } = useViewAll();
+  const { setBottomSearchHandler } = useNavigation();
+  const { setViewLocations } = useViewAllLocations();
+
+  const handleHotelClick = (hotel: any) => {
+    // store selected hotel in context so details page can access it
+    setSelectedHotel(hotel);
+    navigateTo(`hotelDetails/${hotel.id}`);
+  };
 
   // Handle openSearchOnMount changes
   useEffect(() => {
     if (openSearchOnMount) {
+      // reset the flag and expand search
+      setOpenSearchOnMount?.(false);
       window.scrollTo({ top: 0, behavior: "smooth" });
       setTimeout(() => {
         setIsSearchExpanded(true);
-      }, 500);
-    } else {
-      setIsSearchExpanded(false);
+      }, 250);
     }
-  }, [openSearchOnMount]);
+    // Note: when flag is false we don't force collapse here to avoid
+    // interfering with local interactions.
+  }, [openSearchOnMount, setOpenSearchOnMount]);
 
   // Scroll to top when navigating to home
   useEffect(() => {
-    if (currentScreen === "home") {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+  // Register a handler so BottomNav's search button expands the search bar on this screen
+  useEffect(() => {
+    const handler = () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-  }, [currentScreen]);
+      setIsSearchExpanded(true);
+    };
+
+    // store the handler function in navigation context
+    setBottomSearchHandler?.(() => handler);
+
+    return () => {
+      // cleanup when leaving the home screen
+      setBottomSearchHandler?.(undefined);
+    };
+  }, []);
   const featuredHotels = [
     {
       id: 1,
@@ -317,6 +357,8 @@ export function HomePage({ onViewAllHotels, onViewAllLocations, onHotelClick, on
     },
   ];
 
+  const allHotels = getMockHotels();
+
   return (
     <div className="min-h-screen bg-white pb-24">
       {/* Header */}
@@ -325,7 +367,8 @@ export function HomePage({ onViewAllHotels, onViewAllLocations, onHotelClick, on
         style={{
           backgroundColor: "#007AFF",
           borderRadius: "0 0 32px 32px",
-          fontFamily: "Quicksand, Nunito, Poppins, Rounded, system-ui, sans-serif",
+          fontFamily:
+            "Quicksand, Nunito, Poppins, Rounded, system-ui, sans-serif",
         }}
       >
         <h1 className="text-white mb-2 text-4xl font-bold">StayWise</h1>
@@ -408,12 +451,15 @@ export function HomePage({ onViewAllHotels, onViewAllLocations, onHotelClick, on
             onSearch={(query) => {
               setIsSearchExpanded(false);
               setIsSearching(true);
-              
-              // Simular búsqueda con delay
+
+              // navigate to the search page with the query so SearchResults can read it
+              navigateTo(`search?query=${encodeURIComponent(query)}`);
+
+              // Simular búsqueda con delay (kept for UX on Home)
               setTimeout(() => {
                 setIsSearching(false);
                 onSearch?.(query);
-              }, 2000);
+              }, 800);
             }}
           />
         </div>
@@ -439,47 +485,47 @@ export function HomePage({ onViewAllHotels, onViewAllLocations, onHotelClick, on
               {/* Animated Search Icon */}
               <motion.div
                 className="relative mb-6"
-                animate={{ 
+                animate={{
                   scale: [1, 1.2, 1],
                 }}
-                transition={{ 
+                transition={{
                   duration: 1.5,
                   repeat: Infinity,
-                  ease: "easeInOut"
+                  ease: "easeInOut",
                 }}
               >
                 <Search size={64} color="white" strokeWidth={2} />
-                
+
                 {/* Ripple effect */}
                 <motion.div
                   className="absolute inset-0 rounded-full border-4 border-white"
                   initial={{ scale: 1, opacity: 0.8 }}
-                  animate={{ 
+                  animate={{
                     scale: [1, 1.5, 2],
-                    opacity: [0.8, 0.4, 0]
+                    opacity: [0.8, 0.4, 0],
                   }}
-                  transition={{ 
+                  transition={{
                     duration: 1.5,
                     repeat: Infinity,
-                    ease: "easeOut"
+                    ease: "easeOut",
                   }}
                 />
                 <motion.div
                   className="absolute inset-0 rounded-full border-4 border-white"
                   initial={{ scale: 1, opacity: 0.8 }}
-                  animate={{ 
+                  animate={{
                     scale: [1, 1.5, 2],
-                    opacity: [0.8, 0.4, 0]
+                    opacity: [0.8, 0.4, 0],
                   }}
-                  transition={{ 
+                  transition={{
                     duration: 1.5,
                     repeat: Infinity,
                     ease: "easeOut",
-                    delay: 0.5
+                    delay: 0.5,
                   }}
                 />
               </motion.div>
-              
+
               <motion.h2
                 className="text-white text-2xl mb-2"
                 initial={{ opacity: 0, y: 10 }}
@@ -496,22 +542,22 @@ export function HomePage({ onViewAllHotels, onViewAllLocations, onHotelClick, on
               >
                 Encontrando los mejores hoteles
               </motion.p>
-              
+
               {/* Animated dots */}
               <motion.div className="flex justify-center gap-2 mt-4">
                 {[0, 1, 2].map((index) => (
                   <motion.div
                     key={index}
                     className="w-2 h-2 rounded-full bg-white"
-                    animate={{ 
+                    animate={{
                       y: [0, -10, 0],
-                      opacity: [0.5, 1, 0.5]
+                      opacity: [0.5, 1, 0.5],
                     }}
-                    transition={{ 
+                    transition={{
                       duration: 0.8,
                       repeat: Infinity,
                       ease: "easeInOut",
-                      delay: index * 0.15
+                      delay: index * 0.15,
                     }}
                   />
                 ))}
@@ -549,10 +595,12 @@ export function HomePage({ onViewAllHotels, onViewAllLocations, onHotelClick, on
               borderRadius: "50%",
             }}
           />
-          
+
           <div className="relative z-10">
             <h2 className="text-white mb-1 text-2xl">Te recomendamos hoy</h2>
-            <p className="text-white/90 text-sm">Contenido curado especialmente para ti</p>
+            <p className="text-white/90 text-sm">
+              Contenido curado especialmente para ti
+            </p>
           </div>
         </div>
       </div>
@@ -562,37 +610,52 @@ export function HomePage({ onViewAllHotels, onViewAllLocations, onHotelClick, on
         title="Tus Recomendaciones Destacadas"
         hotels={featuredHotels}
         featured={true}
-        onViewAll={() => onViewAllHotels?.("Tus Recomendaciones Destacadas", featuredHotels)}
-        onHotelClick={onHotelClick}
+        onViewAll={() => {
+          setViewAll("Tus Recomendaciones Destacadas", featuredHotels);
+          navigateTo("viewAll");
+          onViewAllHotels?.("Tus Recomendaciones Destacadas", featuredHotels);
+        }}
+        onHotelClick={handleHotelClick}
       />
 
       {/* Popular Locations Carousel */}
       <LocationCarousel
         title="Lugares Populares"
         locations={popularLocations}
-        onViewAll={() => onViewAllLocations?.(popularLocations)}
+        onViewAll={() => {
+          // Set locations and navigate to the locations view
+          setViewLocations("Lugares Populares", popularLocations);
+          navigateTo("viewLocations");
+          onViewAllLocations?.(popularLocations);
+        }}
       />
 
       {/* Special Offers Carousel */}
-      <HotelCarousel 
-        title="Ofertas Especiales" 
+      <HotelCarousel
+        title="Ofertas Especiales"
         hotels={specialOffers}
-        onViewAll={() => onViewAllHotels?.("Ofertas Especiales", specialOffers)}
-        onHotelClick={onHotelClick}
+        onViewAll={() => {
+          setViewAll("Ofertas Especiales", specialOffers);
+          navigateTo("viewAll");
+          onViewAllHotels?.("Ofertas Especiales", specialOffers);
+        }}
+        onHotelClick={handleHotelClick}
       />
 
       {/* Popular Hotels Carousel */}
-      <HotelCarousel 
-        title="Hoteles Populares" 
+      <HotelCarousel
+        title="Hoteles Populares"
         hotels={popularHotels}
-        onViewAll={() => onViewAllHotels?.("Hoteles Populares", popularHotels)}
-        onHotelClick={onHotelClick}
+        onViewAll={() => {
+          setViewAll("Hoteles Populares", popularHotels);
+          navigateTo("viewAll");
+          onViewAllHotels?.("Hoteles Populares", popularHotels);
+        }}
+        onHotelClick={handleHotelClick}
       />
 
       {/* Bottom Navigation */}
-      <BottomNav 
-        activeTab={isSearchExpanded ? "search" : "home"}
-      />
+      <BottomNav activeTab={isSearchExpanded ? "search" : "home"} />
     </div>
   );
 }

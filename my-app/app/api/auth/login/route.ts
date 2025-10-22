@@ -3,8 +3,7 @@ import type { NextRequest } from "next/server";
 import { connectDB } from "@/app/lib/mongodb";
 import User from "@/app/lib/models/user.model";
 import { randomUUID } from "crypto";
-import {encrypt} from "@/app/lib/auth/auth";
-import {cookies} from "next/headers";
+import { encrypt, generateSHA256Hash } from "@/app/lib/auth/auth";
 
 export async function POST(request: NextRequest) {
   try {
@@ -32,27 +31,44 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (user.password !== password) {
+    const hashed = await generateSHA256Hash(password);
+    // @ts-ignore
+    console.debug("Login attempt for", {
+      email: user.email,
+      storedPasswordLength: (user.password || "").length,
+    });
+
+    const isMatch = user.password === hashed || user.password === password;
+    if (!isMatch) {
       return NextResponse.json(
         { error: "Invalid credentials" },
         { status: 401 }
       );
     }
 
-    await user.save();
-
-
-      const safeUser = {
+    const safeUser = {
       // @ts-ignore
       id: user._id.toString(),
       username: user.username,
       email: user.email,
     };
 
-      const expires = new Date(Date.now() + 60 * 60 * 1000);
-      const session = await encrypt({safeUser, expires});
-      (await cookies()).set('session', session, { expires, httpOnly: true });
-      return NextResponse.json({ok: true,user: safeUser}, {status: 200});
+    const expires = new Date(Date.now() + 60 * 60 * 1000);
+    const session = await encrypt({ safeUser, expires });
+
+    const res = NextResponse.json(
+      { ok: true, user: safeUser },
+      { status: 200 }
+    );
+    // @ts-ignore
+    res.cookies.set({
+      name: "session",
+      value: session,
+      httpOnly: true,
+      expires,
+      path: "/",
+    });
+    return res;
   } catch (err) {
     console.error("Login error:", err);
     return NextResponse.json(

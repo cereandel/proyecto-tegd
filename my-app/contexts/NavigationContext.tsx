@@ -1,6 +1,8 @@
+// file: my-app/contexts/NavigationContext.tsx
 "use client";
 
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, ReactNode, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type Screen =
   | "login"
@@ -8,25 +10,29 @@ type Screen =
   | "home"
   | "viewAllHotels"
   | "viewAllLocations"
-  | "hotelDetails"
   | "searchResults"
   | "reservations"
   | "favorites"
-  | "profile";
+  | "profile"
+  | string;
 
 interface NavigationContextType {
-  currentScreen: Screen;
-  previousScreen: Screen | null;
   navigateTo: (screen: Screen) => void;
-  navigateBack: () => void;
   navigateToHome: () => void;
-  navigateToSearch: () => void;
+  navigateToSearch: (open?: boolean) => void;
   navigateToBookings: () => void;
   navigateToFavorites: () => void;
   navigateToProfile: () => void;
   navigateToLogin: () => void;
+  navigateToHotelDetails: (id: string | number) => void;
+  navigateBack: () => void;
   openSearchOnMount: boolean;
   setOpenSearchOnMount: (value: boolean) => void;
+  // optional handlers that client screens can register to override bottom nav behavior
+  bottomHomeHandler?: (() => void) | undefined;
+  setBottomHomeHandler: (fn?: () => void) => void;
+  bottomSearchHandler?: (() => void) | undefined;
+  setBottomSearchHandler: (fn?: () => void) => void;
 }
 
 const NavigationContext = createContext<NavigationContextType | undefined>(
@@ -34,75 +40,61 @@ const NavigationContext = createContext<NavigationContextType | undefined>(
 );
 
 export function NavigationProvider({ children }: { children: ReactNode }) {
-  const [currentScreen, setCurrentScreen] = useState<Screen>("login");
-  const [previousScreen, setPreviousScreen] = useState<Screen | null>(null);
-  const [openSearchOnMount, setOpenSearchOnMount] = useState(false);
+  const router = useRouter();
+  const [openSearchOnMount, setOpenSearchOnMount] = useState<boolean>(false);
 
-  const navigateTo = (screen: Screen) => {
-    setPreviousScreen(currentScreen);
-    setCurrentScreen(screen);
+  // handlers that can be registered by active client screens
+  const [bottomHomeHandler, setBottomHomeHandler] = useState<
+    (() => void) | undefined
+  >(undefined);
+  const [bottomSearchHandler, setBottomSearchHandler] = useState<
+    (() => void) | undefined
+  >(undefined);
+
+  const navigateTo = (screen: Screen | string) => {
+    const path =
+      typeof screen === "string" && screen.startsWith("/")
+        ? screen
+        : `/${screen}`;
+    router.push(path);
+  };
+
+  const navigateToHome = () => navigateTo("home");
+  const navigateToSearch = (open = true) => {
+    if (open) setOpenSearchOnMount(true);
+    navigateTo("search");
+  };
+  const navigateToBookings = () => navigateTo("reservations");
+  const navigateToFavorites = () => navigateTo("favorites");
+  const navigateToProfile = () => navigateTo("profile");
+  const navigateToLogin = () => navigateTo("login");
+
+  const navigateToHotelDetails = (id: string | number) => {
+    navigateTo(`hotelDetails/${id}`);
   };
 
   const navigateBack = () => {
-    if (previousScreen) {
-      setCurrentScreen(previousScreen);
-      setPreviousScreen(null);
-    } else {
-      setCurrentScreen("home");
-    }
-  };
-
-  const navigateToHome = () => {
-    setOpenSearchOnMount(false);
-    setPreviousScreen(currentScreen);
-    setCurrentScreen("home");
-  };
-
-  const navigateToSearch = () => {
-    setOpenSearchOnMount(true);
-    setPreviousScreen(currentScreen);
-    setCurrentScreen("home");
-  };
-
-  const navigateToBookings = () => {
-    setOpenSearchOnMount(false);
-    setPreviousScreen(currentScreen);
-    setCurrentScreen("reservations");
-  };
-
-  const navigateToFavorites = () => {
-    setOpenSearchOnMount(false);
-    setPreviousScreen(currentScreen);
-    setCurrentScreen("favorites");
-  };
-
-  const navigateToProfile = () => {
-    setOpenSearchOnMount(false);
-    setPreviousScreen(currentScreen);
-    setCurrentScreen("profile");
-  };
-
-  const navigateToLogin = () => {
-    setOpenSearchOnMount(false);
-    setPreviousScreen(null);
-    setCurrentScreen("login");
+    router.back();
   };
 
   return (
     <NavigationContext.Provider
       value={{
-        currentScreen,
-        previousScreen,
         navigateTo,
-        navigateBack,
         navigateToHome,
         navigateToSearch,
         navigateToBookings,
         navigateToFavorites,
         navigateToProfile,
+        navigateToHotelDetails,
+        navigateBack,
         navigateToLogin,
         openSearchOnMount,
         setOpenSearchOnMount,
+        bottomHomeHandler,
+        setBottomHomeHandler,
+        bottomSearchHandler,
+        setBottomSearchHandler,
       }}
     >
       {children}
@@ -111,9 +103,8 @@ export function NavigationProvider({ children }: { children: ReactNode }) {
 }
 
 export function useNavigation() {
-  const context = useContext(NavigationContext);
-  if (context === undefined) {
-    throw new Error("useNavigation must be used within a NavigationProvider");
-  }
-  return context;
+  const ctx = useContext(NavigationContext);
+  if (!ctx)
+    throw new Error("useNavigation must be used within NavigationProvider");
+  return ctx;
 }

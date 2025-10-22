@@ -5,6 +5,8 @@ import { HotelCard } from "./HotelCard";
 import { BottomNav } from "./BottomNav";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useEffect } from "react";
+import { useNavigation } from "../contexts/NavigationContext";
 
 interface Hotel {
   id: number;
@@ -22,6 +24,7 @@ interface SearchResultsProps {
   onClearSearch: () => void;
   onHotelClick?: (hotel: Hotel) => void;
   onSearch?: (query: string) => void;
+  initialExpanded?: boolean;
 }
 
 export function SearchResults({
@@ -31,8 +34,9 @@ export function SearchResults({
   onClearSearch,
   onHotelClick,
   onSearch,
+  initialExpanded = false,
 }: SearchResultsProps) {
-  const [isSearching, setIsSearching] = useState(false);
+  const [isSearching, setIsSearching] = useState<boolean>(initialExpanded);
   const [isPerformingSearch, setIsPerformingSearch] = useState(false);
   const [newSearchValue, setNewSearchValue] = useState("");
   const handleHomeFromBottomNav = () => {
@@ -44,11 +48,40 @@ export function SearchResults({
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const {
+    setBottomHomeHandler,
+    setBottomSearchHandler,
+    openSearchOnMount,
+    setOpenSearchOnMount,
+  } = useNavigation();
+
+  useEffect(() => {
+    // Register handlers so BottomNav can invoke them while this screen is active
+    setBottomHomeHandler(() => handleHomeFromBottomNav);
+    setBottomSearchHandler(() => handleSearchFromBottomNav);
+
+    // Cleanup when leaving the screen to avoid stale handlers
+    return () => {
+      setBottomHomeHandler(undefined);
+      setBottomSearchHandler(undefined);
+    };
+    // include setters in deps so eslint/react-hooks won't warn; functions are stable from context
+  }, [setBottomHomeHandler, setBottomSearchHandler]);
+
+  // If navigation requested opening search on mount, open input and reset flag
+  useEffect(() => {
+    if (openSearchOnMount) {
+      setIsSearching(true);
+      setOpenSearchOnMount(false);
+      // bring into view
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [openSearchOnMount, setOpenSearchOnMount]);
+
   const handleNewSearch = () => {
     if (newSearchValue.trim()) {
       setIsPerformingSearch(true);
-      
-      // Simular búsqueda con delay
+
       setTimeout(() => {
         onSearch?.(newSearchValue.trim());
         setIsSearching(false);
@@ -138,7 +171,8 @@ export function SearchResults({
         {hotels.length > 0 ? (
           <>
             <p className="text-gray-600 mb-4">
-              Encontramos {hotels.length} {hotels.length === 1 ? "hotel" : "hoteles"}
+              Encontramos {hotels.length}{" "}
+              {hotels.length === 1 ? "hotel" : "hoteles"}
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {hotels.map((hotel) => (
@@ -184,9 +218,7 @@ export function SearchResults({
       </div>
 
       {/* Bottom Navigation */}
-      <BottomNav 
-        activeTab="search"
-      />
+      <BottomNav activeTab="search" />
 
       {/* Searching Overlay */}
       <AnimatePresence>
@@ -208,47 +240,47 @@ export function SearchResults({
               {/* Animated Search Icon */}
               <motion.div
                 className="relative mb-6"
-                animate={{ 
+                animate={{
                   scale: [1, 1.2, 1],
                 }}
-                transition={{ 
+                transition={{
                   duration: 1.5,
                   repeat: Infinity,
-                  ease: "easeInOut"
+                  ease: "easeInOut",
                 }}
               >
                 <Search size={64} color="white" strokeWidth={2} />
-                
+
                 {/* Ripple effect */}
                 <motion.div
                   className="absolute inset-0 rounded-full border-4 border-white"
                   initial={{ scale: 1, opacity: 0.8 }}
-                  animate={{ 
+                  animate={{
                     scale: [1, 1.5, 2],
-                    opacity: [0.8, 0.4, 0]
+                    opacity: [0.8, 0.4, 0],
                   }}
-                  transition={{ 
+                  transition={{
                     duration: 1.5,
                     repeat: Infinity,
-                    ease: "easeOut"
+                    ease: "easeOut",
                   }}
                 />
                 <motion.div
                   className="absolute inset-0 rounded-full border-4 border-white"
                   initial={{ scale: 1, opacity: 0.8 }}
-                  animate={{ 
+                  animate={{
                     scale: [1, 1.5, 2],
-                    opacity: [0.8, 0.4, 0]
+                    opacity: [0.8, 0.4, 0],
                   }}
-                  transition={{ 
+                  transition={{
                     duration: 1.5,
                     repeat: Infinity,
                     ease: "easeOut",
-                    delay: 0.5
+                    delay: 0.5,
                   }}
                 />
               </motion.div>
-              
+
               <motion.h2
                 className="text-white text-2xl mb-2"
                 initial={{ opacity: 0, y: 10 }}
@@ -265,22 +297,22 @@ export function SearchResults({
               >
                 Encontrando los mejores hoteles
               </motion.p>
-              
+
               {/* Animated dots */}
               <motion.div className="flex justify-center gap-2 mt-4">
                 {[0, 1, 2].map((index) => (
                   <motion.div
                     key={index}
                     className="w-2 h-2 rounded-full bg-white"
-                    animate={{ 
+                    animate={{
                       y: [0, -10, 0],
-                      opacity: [0.5, 1, 0.5]
+                      opacity: [0.5, 1, 0.5],
                     }}
-                    transition={{ 
+                    transition={{
                       duration: 0.8,
                       repeat: Infinity,
                       ease: "easeInOut",
-                      delay: index * 0.15
+                      delay: index * 0.15,
                     }}
                   />
                 ))}

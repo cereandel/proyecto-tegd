@@ -1,34 +1,24 @@
-import type { Metadata } from "next";
+"use client";
+
 import "../styles/globals.css";
+import "../index.css";
+import { ReactNode } from "react";
+import { NavigationProvider } from "../contexts/NavigationContext";
+import { SelectedHotelProvider } from "../contexts/SelectedHotelContext";
+import { ViewAllProvider } from "../contexts/ViewAllContext";
+import { ViewAllLocationsProvider } from "../contexts/ViewAllLocationsContext";
 
-export const metadata: Metadata = {
-  title: "StayWise - Reservación de Hoteles",
-  description: "Encuentra y reserva los mejores hoteles alrededor del mundo",
-};
-
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function App({ children }: { children?: ReactNode }) {
   return (
     <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&family=Nunito:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap"
-          rel="stylesheet"
-        />
-      </head>
-
       <body>
-        <div id="root">{children}</div>
-        {/*         <script type="module" src="/src/main.tsx"></script> */}
+        <NavigationProvider>
+          <SelectedHotelProvider>
+            <ViewAllProvider>
+              <ViewAllLocationsProvider>{children}</ViewAllLocationsProvider>
+            </ViewAllProvider>
+          </SelectedHotelProvider>
+        </NavigationProvider>
       </body>
     </html>
   );

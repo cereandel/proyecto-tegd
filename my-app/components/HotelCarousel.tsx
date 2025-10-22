@@ -19,7 +19,13 @@ interface HotelCarouselProps {
   onHotelClick?: (hotel: Hotel) => void;
 }
 
-export function HotelCarousel({ title, hotels, featured = false, onViewAll, onHotelClick }: HotelCarouselProps) {
+export function HotelCarousel({
+  title,
+  hotels,
+  featured = false,
+  onViewAll,
+  onHotelClick,
+}: HotelCarouselProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: "left" | "right") => {
@@ -39,10 +45,12 @@ export function HotelCarousel({ title, hotels, featured = false, onViewAll, onHo
     <div className="mb-8">
       {/* Section Header */}
       <div className="flex items-center justify-between mb-4 px-6">
-        <h3 className={`text-gray-900 ${featured ? "text-xl" : ""}`}>{title}</h3>
-        <button 
+        <h3 className={`text-gray-900 ${featured ? "text-xl" : ""}`}>
+          {title}
+        </h3>
+        <button
           onClick={onViewAll}
-          className="text-sm" 
+          className="text-sm"
           style={{ color: "#007AFF" }}
         >
           Ver todos
@@ -71,10 +79,10 @@ export function HotelCarousel({ title, hotels, featured = false, onViewAll, onHo
         <div
           ref={scrollContainerRef}
           className="flex gap-4 overflow-x-auto scrollbar-hide px-6 py-2"
-          style={{ 
-            scrollbarWidth: "none", 
+          style={{
+            scrollbarWidth: "none",
             msOverflowStyle: "none",
-            scrollBehavior: "smooth"
+            scrollBehavior: "smooth",
           }}
         >
           {hotels.map((hotel) => (

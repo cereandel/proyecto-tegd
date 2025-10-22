@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { connectDB } from "@/app/lib/mongodb";
 import User from "@/app/lib/models/user.model";
+import { generateSHA256Hash } from "@/app/lib/auth/auth";
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,13 +28,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    await User.create({
+    const hashed = await generateSHA256Hash(password);
+
+    const created = await User.create({
       username,
       email,
-      password,
+      password: hashed,
     });
 
-    return NextResponse.json({ ok: true }, { status: 201 });
+    return NextResponse.json(
+      {
+        ok: true,
+        user: {
+          id: created._id,
+          username: created.username,
+          email: created.email,
+        },
+      },
+      { status: 201 }
+    );
   } catch (err) {
     console.error("Signup error:", err);
     return NextResponse.json(

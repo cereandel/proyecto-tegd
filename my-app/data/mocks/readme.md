@@ -1,0 +1,1 @@
+me daba flojera consultar y llenar datos de la bd

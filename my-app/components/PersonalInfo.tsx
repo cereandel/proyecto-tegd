@@ -8,42 +8,51 @@ import { Label } from "./ui/label";
 
 interface PersonalInfoProps {
   onBack: () => void;
+  user?: { username?: string; email?: string } | null;
 }
 
-export function PersonalInfo({ onBack }: PersonalInfoProps) {
+export function PersonalInfo({ onBack, user }: PersonalInfoProps) {
+  const username = user?.username || "";
+  const nameParts = username.trim().split(/\s+/);
+  const firstName = nameParts[0] || "";
+  const lastName = nameParts.slice(1).join(" ") || "";
+
   const [formData] = useState({
-    firstName: "María",
-    lastName: "González",
-    email: "maria.gonzalez@email.com",
+    firstName: firstName || "",
+    lastName: lastName || "",
+    email: user?.email || "",
   });
 
   const inputFields = [
-    { 
-      id: "firstName", 
-      label: "Nombre", 
-      icon: User, 
+    {
+      id: "firstName",
+      label: "Nombre",
+      icon: User,
       value: formData.firstName,
-      placeholder: "Ingresa tu nombre"
+      placeholder: "Ingresa tu nombre",
     },
-    { 
-      id: "lastName", 
-      label: "Apellido", 
-      icon: User, 
+    {
+      id: "lastName",
+      label: "Apellido",
+      icon: User,
       value: formData.lastName,
-      placeholder: "Ingresa tu apellido"
+      placeholder: "Ingresa tu apellido",
     },
-    { 
-      id: "email", 
-      label: "Correo Electrónico", 
-      icon: Mail, 
+    {
+      id: "email",
+      label: "Correo Electrónico",
+      icon: Mail,
       value: formData.email,
       type: "email",
-      placeholder: "tu@email.com"
+      placeholder: "tu@email.com",
     },
   ];
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#FFFFFF" }}>
+    <div
+      className="min-h-screen flex flex-col"
+      style={{ backgroundColor: "#FFFFFF" }}
+    >
       {/* Header */}
       <div
         className="pt-12 pb-6 px-6 sticky top-0 z-10"
@@ -76,8 +85,8 @@ export function PersonalInfo({ onBack }: PersonalInfoProps) {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
             >
-              <Label 
-                htmlFor={field.id} 
+              <Label
+                htmlFor={field.id}
                 className="mb-2 block"
                 style={{ color: "#1D1D1F" }}
               >
@@ -104,8 +113,6 @@ export function PersonalInfo({ onBack }: PersonalInfoProps) {
             </motion.div>
           ))}
         </motion.div>
-
-
       </div>
     </div>
   );
