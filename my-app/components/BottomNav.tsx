@@ -9,9 +9,7 @@ interface BottomNavProps {
 export function BottomNav({ activeTab = "home" }: BottomNavProps) {
   const {
     navigateToHome,
-    // navigateToSearch,
     navigateToBookings,
-    navigateToFavorites,
     navigateToProfile,
     bottomHomeHandler,
     bottomSearchHandler,
@@ -22,7 +20,6 @@ export function BottomNav({ activeTab = "home" }: BottomNavProps) {
     { id: "home", label: "Inicio", icon: Home },
     { id: "search", label: "Búsqueda", icon: Search },
     { id: "bookings", label: "Reservas", icon: Calendar },
-    { id: "favorites", label: "Favoritos", icon: Heart },
     { id: "profile", label: "Perfil", icon: User },
   ];
 
@@ -65,9 +62,7 @@ export function BottomNav({ activeTab = "home" }: BottomNavProps) {
       }
     } else if (id === "bookings") {
       navigateToBookings();
-    } else if (id === "favorites") {
-      navigateToFavorites();
-    } else if (id === "profile") {
+    }  else if (id === "profile") {
       navigateToProfile();
     }
   };

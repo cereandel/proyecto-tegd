@@ -22,9 +22,7 @@ import { useState } from "react";
 type SettingsView =
   | "main"
   | "personalInfo"
-  | "preferences"
-  | "security"
-  | "payment";
+  | "preferences";
 
 export function Profile({
   user,
@@ -77,32 +75,6 @@ export function Profile({
           color: "#FF2D55",
           onClick: () => setCurrentView("preferences"),
         },
-        {
-          icon: MapPin,
-          label: "Destinos Favoritos",
-          description: "Lugares que te interesan",
-          color: "#34C759",
-          onClick: () => navigateToFavorites(),
-        },
-      ],
-    },
-    {
-      title: "Seguridad",
-      items: [
-        {
-          icon: Shield,
-          label: "Seguridad y Contraseña",
-          description: "Cambiar contraseña",
-          color: "#AF52DE",
-          onClick: () => setCurrentView("security"),
-        },
-        {
-          icon: CreditCard,
-          label: "Métodos de Pago",
-          description: "Tarjetas guardadas",
-          color: "#00C7BE",
-          onClick: () => setCurrentView("payment"),
-        },
       ],
     },
   ];
@@ -116,15 +88,6 @@ export function Profile({
     return <HotelPreferences onBack={() => setCurrentView("main")} />;
   }
 
-  if (currentView === "security") {
-    return (
-      <SecuritySettings onBack={() => setCurrentView("main")} user={user} />
-    );
-  }
-
-  if (currentView === "payment") {
-    return <PaymentMethods onBack={() => setCurrentView("main")} />;
-  }
 
   // Render main profile view
   return (
@@ -175,17 +138,6 @@ export function Profile({
                   <p className="text-white">12</p>
                 </div>
                 <p className="text-white/70 text-xs">Reservas</p>
-              </div>
-              <div className="text-center">
-                <div className="flex items-center justify-center gap-1 mb-1">
-                  <Heart
-                    size={16}
-                    fill="#FF2D55"
-                    style={{ color: "#FF2D55" }}
-                  />
-                  <p className="text-white">8</p>
-                </div>
-                <p className="text-white/70 text-xs">Favoritos</p>
               </div>
               <div className="text-center">
                 <div className="flex items-center justify-center gap-1 mb-1">

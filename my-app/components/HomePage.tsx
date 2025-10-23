@@ -618,30 +618,6 @@ export function HomePage({
         onHotelClick={handleHotelClick}
       />
 
-      {/* Popular Locations Carousel */}
-      <LocationCarousel
-        title="Lugares Populares"
-        locations={popularLocations}
-        onViewAll={() => {
-          // Set locations and navigate to the locations view
-          setViewLocations("Lugares Populares", popularLocations);
-          navigateTo("viewLocations");
-          onViewAllLocations?.(popularLocations);
-        }}
-      />
-
-      {/* Special Offers Carousel */}
-      <HotelCarousel
-        title="Ofertas Especiales"
-        hotels={specialOffers}
-        onViewAll={() => {
-          setViewAll("Ofertas Especiales", specialOffers);
-          navigateTo("viewAll");
-          onViewAllHotels?.("Ofertas Especiales", specialOffers);
-        }}
-        onHotelClick={handleHotelClick}
-      />
-
       {/* Popular Hotels Carousel */}
       <HotelCarousel
         title="Hoteles Populares"
