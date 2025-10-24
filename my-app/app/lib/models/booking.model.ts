@@ -1,21 +1,21 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IBooking extends Document {
-  user: mongoose.Types.ObjectId;
-  hotel: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
+  hotelId: mongoose.Types.ObjectId;
   checkInDate: Date;
   checkOutDate: Date;
 }
 
 const bookingSchema: Schema<IBooking> = new Schema(
   {
-    user: {
+    userId: {
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
       index: true,
     },
-    hotel: {
+    hotelId: {
       type: Schema.Types.ObjectId,
       ref: "Hotel",
       required: true,
