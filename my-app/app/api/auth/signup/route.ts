@@ -7,41 +7,47 @@ import { generateSHA256Hash } from "@/app/lib/auth/auth";
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { username, email, password } = body || {};
+    const { name, email, password, preferences } = body || {};
 
-    if (!username || !email || !password) {
+    if (!name || !email || !password) {
       return NextResponse.json(
-        { error: "username, email and password are required" },
+        { error: "name, email and password are required" },
         { status: 400 }
       );
     }
     await connectDB();
 
     const existing = await User.findOne({
-      $or: [{ username }, { email }],
+      $or: [{ name }, { email }],
     }).exec();
     if (existing) {
       return NextResponse.json(
-        { error: "username or email already in use" },
+        { error: "name or email already in use" },
         { status: 409 }
       );
     }
 
     const hashed = await generateSHA256Hash(password);
 
-    const created = await User.create({
-      name: username,
+    const createPayload: any = {
+      name,
       email,
       password: hashed,
-    });
+    };
+    if (preferences && typeof preferences === "object") {
+      createPayload.preferences = preferences;
+    }
+
+    const created = await User.create(createPayload);
 
     return NextResponse.json(
       {
         ok: true,
         user: {
           id: created._id,
-          username: created.username,
+          name: created.name,
           email: created.email,
+          preferences: created.preferences,
         },
       },
       { status: 201 }

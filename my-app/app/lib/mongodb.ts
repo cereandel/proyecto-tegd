@@ -161,8 +161,8 @@ export async function processRecommendations() {
   await seedDatabase();
 
   // No sample user available by default; just disconnect after seeding.
-  await mongoose.disconnect();
+  //await mongoose.disconnect();
   return null;
 }
 
-processRecommendations()
+//processRecommendations()

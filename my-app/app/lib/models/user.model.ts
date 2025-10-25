@@ -9,7 +9,7 @@ export interface IUser extends Document {
     priceRange: string[];
     groupSize: string[];
     amenities: string[];
-  }
+  };
   //bookings: mongoose.Types.ObjectId[];
   sessionToken?: string;
 }
@@ -27,11 +27,38 @@ const userSchema: Schema<IUser> = new Schema(
     password: { type: String, required: true },
     sessionToken: { type: String },
     preferences: {
-      hotelType: { type: [String], enum: ["Resort","Budget", "Boutique", "Business", "Family"] },
-      priceRange: { type: [String], enum: ["Low", "Medium", "Expensive"] },
-      groupSize: { type: [String], enum: ["Solo", "Couple", "Family", "Group"] },
-      amenities: { type: [String], enum: ["wifi", "breakfast", "gym", "pool", "parking","free-wifi","conference-room",
-                                          "beach-access", "spa","bar", "room-service"] }
+      hotelType: {
+        type: [String],
+        enum: ["Resort", "Budget", "Boutique", "Business", "Family"],
+        default: ["Budget"],
+      },
+      priceRange: {
+        type: [String],
+        enum: ["Low", "Medium", "Expensive"],
+        default: ["Medium"],
+      },
+      groupSize: {
+        type: [String],
+        enum: ["Solo", "Couple", "Family", "Group"],
+        default: ["Couple"],
+      },
+      amenities: {
+        type: [String],
+        enum: [
+          "wifi",
+          "breakfast",
+          "gym",
+          "pool",
+          "parking",
+          "free-wifi",
+          "conference-room",
+          "beach-access",
+          "spa",
+          "bar",
+          "room-service",
+        ],
+        default: ["wifi", "breakfast"],
+      },
     },
 
     /* bookings: [

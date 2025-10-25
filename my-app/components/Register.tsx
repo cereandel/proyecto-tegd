@@ -47,34 +47,29 @@ export function Register({ onNavigateToLogin, onRegister }: RegisterProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Limpiar errores previos
     setFormErrors({ name: "", email: "", password: "" });
 
-    // Validación de nombre
     const nameError = validateName(formData.name);
     if (nameError) {
       setFormErrors((prev) => ({ ...prev, name: nameError }));
       return;
     }
 
-    // Validación local de contraseñas diferentes
     const passwordError = validatePasswords();
     if (passwordError) {
       setFormErrors((prev) => ({ ...prev, password: passwordError }));
       return;
     }
 
-    // Iniciar animación de creación
     setIsCreating(true);
 
-    // Llamada real al endpoint de signup
     (async () => {
       try {
         const resp = await fetch("/api/auth/signup", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            username: formData.name,
+            name: formData.name,
             email: formData.email,
             password: formData.password,
           }),
@@ -85,7 +80,7 @@ export function Register({ onNavigateToLogin, onRegister }: RegisterProps) {
         setIsCreating(false);
 
         if (!resp.ok) {
-          if (data?.error?.includes("username or email")) {
+          if (data?.error?.includes("already in use")) {
             setFormErrors((prev) => ({
               ...prev,
               email: "Este correo o usuario ya está registrado",
@@ -98,7 +93,6 @@ export function Register({ onNavigateToLogin, onRegister }: RegisterProps) {
           return;
         }
 
-        // Éxito
         setIsCreated(true);
         setTimeout(() => {
           setIsCreated(false);
@@ -116,7 +110,6 @@ export function Register({ onNavigateToLogin, onRegister }: RegisterProps) {
 
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    // Limpiar error del campo cuando el usuario empiece a escribir
     if (field === "name" && formErrors.name) {
       setFormErrors((prev) => ({ ...prev, name: "" }));
     }

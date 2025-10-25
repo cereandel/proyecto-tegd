@@ -1,6 +1,20 @@
 "use client";
 
-import { ChevronLeft, Home, DollarSign, Users, Sparkles, Wifi, Coffee, Dumbbell, Waves, Car, Wind, Check, XCircle } from "lucide-react";
+import {
+  ChevronLeft,
+  Home,
+  DollarSign,
+  Users,
+  Sparkles,
+  Wifi,
+  Coffee,
+  Dumbbell,
+  Waves,
+  Car,
+  Wind,
+  Check,
+  XCircle,
+} from "lucide-react";
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -20,21 +34,34 @@ export function HotelPreferences({ onBack }: HotelPreferencesProps) {
   const [showSaveError, setShowSaveError] = useState(false);
 
   const handleSave = () => {
-    setShowSaveAnimation(true);
-    setTimeout(() => {
-      setShowSaveAnimation(false);
-      
-      // Para simular error al guardar, descomenta la siguiente línea:
-      // const hasError = preferences.hotelType.length === 0;
-      const hasError = false;
-      
-      if (hasError) {
+    (async () => {
+      try {
+        setShowSaveAnimation(true);
+        const resp = await fetch("/api/user/preferences", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ preferences }),
+        });
+        const data = await resp.json();
+
+        setTimeout(() => setShowSaveAnimation(false), 700);
+        if (!resp.ok) {
+          console.error("Save preferences failed:", data);
+          setShowSaveError(true);
+          setTimeout(() => setShowSaveError(false), 3000);
+          return;
+        }
+        if (data?.preferences) {
+          setPreferences(data.preferences as any);
+        }
+      } catch (err) {
+        console.error("Save preferences error:", err);
+
+        setTimeout(() => setShowSaveAnimation(false), 700);
         setShowSaveError(true);
-        setTimeout(() => {
-          setShowSaveError(false);
-        }, 3000);
+        setTimeout(() => setShowSaveError(false), 3000);
       }
-    }, 2000);
+    })();
   };
 
   const hotelTypes = [
@@ -66,25 +93,28 @@ export function HotelPreferences({ onBack }: HotelPreferencesProps) {
   ];
 
   const toggleHotelType = (id: string) => {
-    setPreferences(prev => ({
+    setPreferences((prev) => ({
       ...prev,
       hotelType: prev.hotelType.includes(id)
-        ? prev.hotelType.filter(t => t !== id)
-        : [...prev.hotelType, id]
+        ? prev.hotelType.filter((t) => t !== id)
+        : [...prev.hotelType, id],
     }));
   };
 
   const toggleAmenity = (id: string) => {
-    setPreferences(prev => ({
+    setPreferences((prev) => ({
       ...prev,
       amenities: prev.amenities.includes(id)
-        ? prev.amenities.filter(a => a !== id)
-        : [...prev.amenities, id]
+        ? prev.amenities.filter((a) => a !== id)
+        : [...prev.amenities, id],
     }));
   };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#FFFFFF" }}>
+    <div
+      className="min-h-screen flex flex-col"
+      style={{ backgroundColor: "#FFFFFF" }}
+    >
       {/* Header */}
       <div
         className="pt-12 pb-6 px-6 sticky top-0 z-10"
@@ -125,14 +155,19 @@ export function HotelPreferences({ onBack }: HotelPreferencesProps) {
                   style={{
                     backgroundColor: isSelected ? `${type.color}15` : "#F9FAFB",
                     borderRadius: "20px",
-                    border: isSelected ? `2px solid ${type.color}` : "1px solid #E5E7EB",
+                    border: isSelected
+                      ? `2px solid ${type.color}`
+                      : "1px solid #E5E7EB",
                   }}
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.2, delay: index * 0.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <type.icon size={28} style={{ color: isSelected ? type.color : "#8E8E93" }} />
+                  <type.icon
+                    size={28}
+                    style={{ color: isSelected ? type.color : "#8E8E93" }}
+                  />
                   <span style={{ color: isSelected ? type.color : "#1D1D1F" }}>
                     {type.label}
                   </span>
@@ -158,12 +193,18 @@ export function HotelPreferences({ onBack }: HotelPreferencesProps) {
               return (
                 <motion.button
                   key={range.id}
-                  onClick={() => setPreferences({ ...preferences, priceRange: range.id })}
+                  onClick={() =>
+                    setPreferences({ ...preferences, priceRange: range.id })
+                  }
                   className="w-full p-4 flex items-center justify-between transition-all"
                   style={{
-                    backgroundColor: isSelected ? `${range.color}15` : "#F9FAFB",
+                    backgroundColor: isSelected
+                      ? `${range.color}15`
+                      : "#F9FAFB",
                     borderRadius: "20px",
-                    border: isSelected ? `2px solid ${range.color}` : "1px solid #E5E7EB",
+                    border: isSelected
+                      ? `2px solid ${range.color}`
+                      : "1px solid #E5E7EB",
                   }}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -178,10 +219,15 @@ export function HotelPreferences({ onBack }: HotelPreferencesProps) {
                         borderRadius: "12px",
                       }}
                     >
-                      <DollarSign size={24} color={isSelected ? "white" : "#8E8E93"} />
+                      <DollarSign
+                        size={24}
+                        color={isSelected ? "white" : "#8E8E93"}
+                      />
                     </div>
                     <div className="text-left">
-                      <p style={{ color: isSelected ? range.color : "#1D1D1F" }}>
+                      <p
+                        style={{ color: isSelected ? range.color : "#1D1D1F" }}
+                      >
                         {range.label}
                       </p>
                       <p className="text-sm" style={{ color: "#8E8E93" }}>
@@ -219,12 +265,16 @@ export function HotelPreferences({ onBack }: HotelPreferencesProps) {
               return (
                 <motion.button
                   key={size.id}
-                  onClick={() => setPreferences({ ...preferences, groupSize: size.id })}
+                  onClick={() =>
+                    setPreferences({ ...preferences, groupSize: size.id })
+                  }
                   className="p-3 flex flex-col items-center gap-2 transition-all"
                   style={{
                     backgroundColor: isSelected ? "#007AFF15" : "#F9FAFB",
                     borderRadius: "16px",
-                    border: isSelected ? "2px solid #007AFF" : "1px solid #E5E7EB",
+                    border: isSelected
+                      ? "2px solid #007AFF"
+                      : "1px solid #E5E7EB",
                   }}
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -232,7 +282,10 @@ export function HotelPreferences({ onBack }: HotelPreferencesProps) {
                   whileTap={{ scale: 0.95 }}
                 >
                   <span style={{ fontSize: "28px" }}>{size.icon}</span>
-                  <span className="text-xs" style={{ color: isSelected ? "#007AFF" : "#8E8E93" }}>
+                  <span
+                    className="text-xs"
+                    style={{ color: isSelected ? "#007AFF" : "#8E8E93" }}
+                  >
                     {size.label}
                   </span>
                 </motion.button>
@@ -262,15 +315,23 @@ export function HotelPreferences({ onBack }: HotelPreferencesProps) {
                   style={{
                     backgroundColor: isSelected ? "#34C75915" : "#F9FAFB",
                     borderRadius: "16px",
-                    border: isSelected ? "2px solid #34C759" : "1px solid #E5E7EB",
+                    border: isSelected
+                      ? "2px solid #34C759"
+                      : "1px solid #E5E7EB",
                   }}
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.2, delay: 0.3 + index * 0.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
-                  <amenity.icon size={20} style={{ color: isSelected ? "#34C759" : "#8E8E93" }} />
-                  <span className="text-sm" style={{ color: isSelected ? "#34C759" : "#1D1D1F" }}>
+                  <amenity.icon
+                    size={20}
+                    style={{ color: isSelected ? "#34C759" : "#8E8E93" }}
+                  />
+                  <span
+                    className="text-sm"
+                    style={{ color: isSelected ? "#34C759" : "#1D1D1F" }}
+                  >
                     {amenity.label}
                   </span>
                 </motion.button>
