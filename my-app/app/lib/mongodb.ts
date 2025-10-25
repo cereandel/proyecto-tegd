@@ -118,6 +118,7 @@ async function seedDatabase(): Promise<void> {
       password: "password123",
     });
 
+    /*
     const booking1 = await Booking.create({
       userId: user._id,
       hotelId: hotels[0]._id,
@@ -144,9 +145,9 @@ async function seedDatabase(): Promise<void> {
 
     await user.save();
 
-    console.log("Database seeded successfully!");
-
-    console.log("Database seeded successfully (hotels only)!");
+    //console.log("Database seeded successfully!");
+    */
+    console.log("Database seeded successfully (hotels and one user only)!");
   } catch (error) {
     console.error("Error seeding database:", error);
   }
