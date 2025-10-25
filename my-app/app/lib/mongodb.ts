@@ -3,6 +3,7 @@ import User from "./models/user.model";
 import Hotel from "./models/hotel.model";
 import Booking from "./models/booking.model";
 import { getRecommendations } from "./services/recommendation.service";
+import HotelModel from "./models/hotel.model";
 const MONGO_URI: string = "mongodb://localhost:27017/staywise";
 
 export async function connectDB(): Promise<void> {
@@ -45,72 +46,106 @@ async function seedDatabase(): Promise<void> {
       {
         name: "The Grand Resort",
         description: "A luxurious stay.",
-        location: "Miami",
+          location:{
+              city: 'Miami',
+              country: 'USA',
+          },
         amenities: ["pool", "spa", "gym", "free-wifi"],
         hotelType: "Resort",
+        priceRange: "Expensive",
+        groupSize: "Family",
         pricePerNight: 450,
       },
       {
         name: "City Center Boutique",
         description: "Chic and modern.",
-        location: "New York",
+          location:{
+              city: 'New York',
+              country: 'USA',
+          },
         amenities: ["free-wifi", "bar", "room-service"],
         hotelType: "Boutique",
+        priceRange: "Medium",
+        groupSize: "Couple",
         pricePerNight: 300,
       },
       {
         name: "Budget Stay Inn",
         description: "Affordable and clean.",
-        location: "Chicago",
+          location:{
+              city: 'Chicago',
+              country: 'USA',
+          },
         amenities: ["free-wifi", "parking"],
         hotelType: "Budget",
+        priceRange: "Low",
+        groupSize: "Solo",
         pricePerNight: 90,
       },
       {
         name: "Oceanview Getaway",
         description: "Beachfront paradise.",
-        location: "Malibu",
+          location:{
+              city: 'Malibu',
+              country: 'USA',
+          },
         amenities: ["pool", "beach-access", "spa"],
         hotelType: "Resort",
+        priceRange: "Medium",
+        groupSize: "Couple",
         pricePerNight: 500,
       },
       {
         name: "The Business Hub",
         description: "For the modern professional.",
-        location: "New York",
+          location:{
+              city: 'New York',
+              country: 'USA',
+          },
         amenities: ["gym", "free-wifi", "conference-room"],
         hotelType: "Business",
+        groupSize: "Group",
+        priceRange: "Expensive",
         pricePerNight: 250,
       },
     ]);
 
     
-    /*
+
     const user = await User.create({
-      username: "john_doe",
+      name: "john_doe",
       email: "john.doe@example.com",
       password: "password123",
     });
 
     const booking1 = await Booking.create({
-      user: user._id,
-      hotel: hotels[0]._id,
+      userId: user._id,
+      hotelId: hotels[0]._id,
       checkInDate: new Date(),
       checkOutDate: new Date(),
     });
     const booking2 = await Booking.create({
-      user: user._id,
-      hotel: hotels[3]._id,
+      userId: user._id,
+      hotelId: hotels[3]._id,
       checkInDate: new Date(),
       checkOutDate: new Date(),
     });
 
     // @ts-ignore
-    user.bookings.push(booking1._id, booking2._id);
+    user.preferences.hotelType.push(hotels[0].hotelType, hotels[3].hotelType);
+    user.preferences.priceRange.push(hotels[0].priceRange, hotels[3].priceRange,);
+    user.preferences.groupSize.push(hotels[0].groupSize, hotels[3].groupSize);
+    hotels[0].amenities.forEach((amenitie:String) => {
+        user.preferences.amenities.push(amenitie);
+    })
+    hotels[3].amenities.forEach((amenitie:String) => {
+        user.preferences.amenities.push(amenitie);
+    })
+
     await user.save();
 
     console.log("Database seeded successfully!");
-    */
+
     console.log("Database seeded successfully (hotels only)!");
   } catch (error) {
     console.error("Error seeding database:", error);
@@ -128,3 +163,5 @@ export async function processRecommendations() {
   await mongoose.disconnect();
   return null;
 }
+
+processRecommendations()

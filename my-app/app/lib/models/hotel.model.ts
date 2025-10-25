@@ -9,6 +9,8 @@ export interface IHotel extends Document {
   },
   amenities: string[];
   hotelType: string;
+  priceRange: string;
+  groupSize: string;
   pricePerNight: number;
   images: string[];
   reviews: {
@@ -29,6 +31,8 @@ const hotelSchema: Schema<IHotel> = new Schema(
     },
     amenities: { type: [String], required: true, index: true },
     hotelType: { type: String, required: true, index: true },
+    priceRange: { type: String, required: true, index: true },
+    groupSize: { type: String, required: true, index: true },
     pricePerNight: { type: Number, required: true },
     images: {
       type: [String],

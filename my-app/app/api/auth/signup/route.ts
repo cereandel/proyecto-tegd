@@ -15,7 +15,6 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-
     await connectDB();
 
     const existing = await User.findOne({
@@ -31,7 +30,7 @@ export async function POST(request: NextRequest) {
     const hashed = await generateSHA256Hash(password);
 
     const created = await User.create({
-      username,
+      name: username,
       email,
       password: hashed,
     });

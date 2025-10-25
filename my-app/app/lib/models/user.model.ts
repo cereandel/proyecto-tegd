@@ -27,10 +27,11 @@ const userSchema: Schema<IUser> = new Schema(
     password: { type: String, required: true },
     sessionToken: { type: String },
     preferences: {
-      hotelType: { type: [String], enum: ["resort", "boutique", "business", "family"] },
-      priceRange: { type: [String], enum: ["economic", "midrange", "luxury"] },
-      groupSize: { type: [String], enum: ["solo", "couple", "family", "group"] },
-      amenities: { type: [String], enum: ["wifi", "breakfast", "gym", "pool", "parking"] }
+      hotelType: { type: [String], enum: ["Resort","Budget", "Boutique", "Business", "Family"] },
+      priceRange: { type: [String], enum: ["Low", "Medium", "Expensive"] },
+      groupSize: { type: [String], enum: ["Solo", "Couple", "Family", "Group"] },
+      amenities: { type: [String], enum: ["wifi", "breakfast", "gym", "pool", "parking","free-wifi","conference-room",
+                                          "beach-access", "spa","bar", "room-service"] }
     },
 
     /* bookings: [
