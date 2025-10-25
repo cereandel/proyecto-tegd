@@ -10,6 +10,12 @@ export interface IUser extends Document {
     groupSize: string[];
     amenities: string[];
   };
+  recommendations:{
+      hotelType: Map<string,number>;
+      priceRange: Map<string,number>;
+      groupSize: Map<string,number>;
+      amenities: Map<string,number>;
+  }
   //bookings: mongoose.Types.ObjectId[];
   sessionToken?: string;
 }
@@ -61,6 +67,28 @@ const userSchema: Schema<IUser> = new Schema(
       },
     },
 
+      recommendations: {
+          hotelType: {
+              type: Map,
+              of: Number,
+              default: new Map()
+          },
+          priceRange: {
+              type: Map,
+              of: Number,
+              default: new Map()
+          },
+          groupSize: {
+              type: Map,
+              of: Number,
+              default: new Map()
+          },
+          amenities: {
+              type: Map,
+              of: Number,
+              default: new Map()
+          },
+      },
     /* bookings: [
       {
         type: Schema.Types.ObjectId,

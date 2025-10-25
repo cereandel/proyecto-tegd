@@ -118,7 +118,7 @@ async function seedDatabase(): Promise<void> {
       password: "password123",
     });
 
-    /*
+
     const booking1 = await Booking.create({
       userId: user._id,
       hotelId: hotels[0]._id,
@@ -132,22 +132,74 @@ async function seedDatabase(): Promise<void> {
       checkOutDate: new Date(),
     });
 
-    // @ts-ignore
-    user.preferences.hotelType.push(hotels[0].hotelType, hotels[3].hotelType);
-    user.preferences.priceRange.push(hotels[0].priceRange, hotels[3].priceRange,);
-    user.preferences.groupSize.push(hotels[0].groupSize, hotels[3].groupSize);
-    hotels[0].amenities.forEach((amenitie:String) => {
-        user.preferences.amenities.push(amenitie);
-    })
-    hotels[3].amenities.forEach((amenitie:String) => {
-        user.preferences.amenities.push(amenitie);
-    })
+          // @ts-ignore
+      if (user.recommendations.hotelType.get(hotels[0].hotelType)){
+          user.recommendations.hotelType.set(hotels[0].hotelType,user.recommendations.hotelType.get(hotels[0].hotelType)+1)
+      }
+      else{
+          user.recommendations.hotelType.set(hotels[0].hotelType,1)
+      }
 
-    await user.save();
+      if (user.recommendations.priceRange.get(hotels[0].priceRange)){
+          user.recommendations.priceRange.set(hotels[0].priceRange,user.recommendations.priceRange.get(hotels[0].priceRange)+1)
+      }
+      else{
+          user.recommendations.priceRange.set(hotels[0].priceRange,1)
+      }
 
-    //console.log("Database seeded successfully!");
-    */
-    console.log("Database seeded successfully (hotels and one user only)!");
+      if (user.recommendations.groupSize.get(hotels[0].groupSize)){
+          user.recommendations.groupSize.set(hotels[0].groupSize,user.recommendations.groupSize.get(hotels[0].groupSize)+1)
+      }
+      else{
+          user.recommendations.groupSize.set(hotels[0].groupSize,1)
+      }
+
+      hotels[0].amenities.forEach((amenitie:string)=>{
+          if (user.recommendations.amenities.get(amenitie)){
+              user.recommendations.amenities.set(amenitie,user.recommendations.amenities.get(amenitie)+1)
+          }
+          else{
+              user.recommendations.amenities.set(amenitie,1)
+          }
+      })
+
+      if (user.recommendations.hotelType.get(hotels[3].hotelType)){
+          user.recommendations.hotelType.set(hotels[3].hotelType,user.recommendations.hotelType.get(hotels[3].hotelType)+1)
+      }
+      else{
+          user.recommendations.hotelType.set(hotels[3].hotelType,1)
+      }
+
+      if (user.recommendations.priceRange.get(hotels[3].priceRange)){
+          user.recommendations.priceRange.set(hotels[3].priceRange,user.recommendations.priceRange.get(hotels[3].priceRange)+1)
+      }
+      else{
+          user.recommendations.priceRange.set(hotels[3].priceRange,1)
+      }
+
+      if (user.recommendations.groupSize.get(hotels[3].groupSize)){
+          user.recommendations.groupSize.set(hotels[3].groupSize,user.recommendations.groupSize.get(hotels[3].groupSize)+1)
+      }
+      else{
+          user.recommendations.groupSize.set(hotels[3].groupSize,1)
+      }
+
+      hotels[3].amenities.forEach((amenitie:string)=>{
+          if (user.recommendations.amenities.get(amenitie)){
+              user.recommendations.amenities.set(amenitie,user.recommendations.amenities.get(amenitie)+1)
+          }
+          else{
+              user.recommendations.amenities.set(amenitie,1)
+          }
+      })
+
+
+
+          await user.save();
+
+          console.log("Database seeded successfully!");
+
+      //console.log("Database seeded successfully (hotels and one user only)!");
   } catch (error) {
     console.error("Error seeding database:", error);
   }
@@ -161,8 +213,8 @@ export async function processRecommendations() {
   await seedDatabase();
 
   // No sample user available by default; just disconnect after seeding.
-  //await mongoose.disconnect();
+  await mongoose.disconnect();
   return null;
 }
 
-//processRecommendations()
+processRecommendations()
