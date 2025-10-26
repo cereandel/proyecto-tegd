@@ -49,11 +49,20 @@ export async function POST(request: NextRequest) {
     const safeUser = {
       // @ts-ignore
       id: user._id.toString(),
-      username: user.username,
+      username: user.name,
       email: user.email,
+      preferences: {
+          hotelType: user.preferences.hotelType[0],
+          priceRange: user.preferences.priceRange[0],
+          groupSize: user.preferences.groupSize[0],
+          amenities: [...user.preferences.amenities]
+      }
     };
 
     const expires = new Date(Date.now() + 60 * 60 * 1000);
+
+
+
     const session = await encrypt({ safeUser, expires });
 
     const res = NextResponse.json(

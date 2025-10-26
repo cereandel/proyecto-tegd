@@ -15,8 +15,11 @@ import {
   Check,
   XCircle,
 } from "lucide-react";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import {cookies} from "next/headers";
+import hotelModel from "@/app/lib/models/hotel.model";
+import {getSocketUrl} from "next/dist/client/components/react-dev-overlay/internal/helpers/get-socket-url";
 
 interface HotelPreferencesProps {
   onBack: () => void;
@@ -24,11 +27,30 @@ interface HotelPreferencesProps {
 
 export function HotelPreferences({ onBack }: HotelPreferencesProps) {
   const [preferences, setPreferences] = useState({
-    hotelType: ["resort", "boutique"],
-    priceRange: "medium",
-    groupSize: "couple",
-    amenities: ["wifi", "breakfast", "gym"],
+    hotelType: [],
+    priceRange: "",
+    groupSize: "",
+    amenities: [],
   });
+
+  async function getUserPreferences(){
+      const response = await fetch(`/api/session`, {
+          method: "GET",
+          headers: {"Content-Type": "application/json"},
+      });
+      if (response.ok) {
+          const res = await response.json();
+          setPreferences((prev) => ({
+              ...prev,
+              hotelType: res.session.safeUser.preferences.hotelType,
+              priceRange: res.session.safeUser.preferences.priceRange,
+              groupSize: res.session.safeUser.preferences.groupSize,
+              amenities: res.session.safeUser.preferences.amenities,
+          }));
+      } else {
+          console.log('error al recibir cookie')
+      }
+  }
 
   const [showSaveAnimation, setShowSaveAnimation] = useState(false);
   const [showSaveError, setShowSaveError] = useState(false);
@@ -43,7 +65,6 @@ export function HotelPreferences({ onBack }: HotelPreferencesProps) {
           body: JSON.stringify({ preferences }),
         });
         const data = await resp.json();
-
         setTimeout(() => setShowSaveAnimation(false), 700);
         if (!resp.ok) {
           console.error("Save preferences failed:", data);
@@ -52,7 +73,13 @@ export function HotelPreferences({ onBack }: HotelPreferencesProps) {
           return;
         }
         if (data?.preferences) {
-          setPreferences(data.preferences as any);
+            setPreferences((prev) => ({
+                ...prev,
+                hotelType: data.preferences.hotelType[0],
+                priceRange: data.preferences.priceRange[0],
+                groupSize: data.preferences.groupSize[0],
+                amenities: data.preferences.amenities,
+            }));
         }
       } catch (err) {
         console.error("Save preferences error:", err);
@@ -65,23 +92,23 @@ export function HotelPreferences({ onBack }: HotelPreferencesProps) {
   };
 
   const hotelTypes = [
-    { id: "resort", label: "Resort", icon: Sparkles, color: "#FF9500" },
-    { id: "boutique", label: "Boutique", icon: Home, color: "#5856D6" },
-    { id: "business", label: "Negocios", icon: Wind, color: "#007AFF" },
-    { id: "family", label: "Familiar", icon: Users, color: "#34C759" },
+    { id: "Resort", label: "Resort", icon: Sparkles, color: "#FF9500" },
+    { id: "Boutique", label: "Boutique", icon: Home, color: "#5856D6" },
+    { id: "Business", label: "Negocios", icon: Wind, color: "#007AFF" },
+    { id: "Family", label: "Familiar", icon: Users, color: "#34C759" },
   ];
 
   const priceRanges = [
-    { id: "budget", label: "Económico", range: "< $100", color: "#34C759" },
-    { id: "medium", label: "Medio", range: "$100 - $250", color: "#FF9500" },
-    { id: "luxury", label: "Lujo", range: "> $250", color: "#AF52DE" },
+    { id: "Low", label: "Económico", range: "< $100", color: "#34C759" },
+    { id: "Medium", label: "Medio", range: "$100 - $250", color: "#FF9500" },
+    { id: "Expensive", label: "Lujo", range: "> $250", color: "#AF52DE" },
   ];
 
   const groupSizes = [
-    { id: "solo", label: "Solo", icon: "👤" },
-    { id: "couple", label: "Pareja", icon: "💑" },
-    { id: "family", label: "Familia", icon: "👨‍👩‍👧‍👦" },
-    { id: "group", label: "Grupo", icon: "👥" },
+    { id: "Solo", label: "Solo", icon: "👤" },
+    { id: "Couple", label: "Pareja", icon: "💑" },
+    { id: "Family", label: "Familia", icon: "👨‍👩‍👧‍👦" },
+    { id: "Group", label: "Grupo", icon: "👥" },
   ];
 
   const amenities = [
@@ -109,6 +136,14 @@ export function HotelPreferences({ onBack }: HotelPreferencesProps) {
         : [...prev.amenities, id],
     }));
   };
+
+
+    useEffect(() => {
+        getUserPreferences();
+
+    }, []);
+
+
 
   return (
     <div

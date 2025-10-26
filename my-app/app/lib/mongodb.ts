@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
-import User from "./models/user.model";
-import Hotel from "./models/hotel.model";
+import User, {IUser} from "./models/user.model";
+import Hotel, {IHotel} from "./models/hotel.model";
 import Booking from "./models/booking.model";
 import { getRecommendations } from "./services/recommendation.service";
 import HotelModel from "./models/hotel.model";
@@ -28,6 +28,53 @@ export async function disconnectDB(): Promise<void> {
     console.error("Error disconnecting MongoDB:", error);
   }
 }
+
+function checkRecommendationsMap(type: keyof IUser['recommendations'],key:string, user:IUser){
+    return user.recommendations[type].get(key)
+}
+
+
+export async function fillRecommendations(user:IUser,hotel:IHotel){
+    try {
+        if(checkRecommendationsMap('hotelType',hotel.hotelType,user)){
+            // @ts-ignore
+            user.recommendations.hotelType.set(hotel.hotelType,user.recommendations.hotelType.get(hotel.hotelType)+1)
+        }
+        else{
+            user.recommendations.hotelType.set(hotel.hotelType,1)
+        }
+        if (checkRecommendationsMap('priceRange',hotel.priceRange,user)){
+            // @ts-ignore
+            user.recommendations.priceRange.set(hotel.priceRange,user.recommendations.priceRange.get(hotel.priceRange)+1)
+        }
+        else{
+            user.recommendations.priceRange.set(hotel.priceRange,1)
+        }
+
+        if (checkRecommendationsMap('groupSize',hotel.groupSize,user)){
+            // @ts-ignore
+            user.recommendations.groupSize.set(hotel.groupSize,user.recommendations.groupSize.get(hotel.groupSize)+1)
+        }
+        else{
+            user.recommendations.groupSize.set(hotel.groupSize,1)
+        }
+
+        hotel.amenities.forEach((amenitie:string)=>{
+            if (checkRecommendationsMap('amenities',amenitie,user)){
+                // @ts-ignore
+                user.recommendations.amenities.set(amenitie,user.recommendations.amenities.get(amenitie)+1)
+            }
+            else{
+                user.recommendations.amenities.set(amenitie,1)
+            }
+        })
+
+
+    } catch (error) {
+        console.error("Error disconnecting MongoDB:", error);
+    }
+}
+
 
 /**
  * Seeds the database with initial data if collections are empty.
@@ -77,7 +124,7 @@ async function seedDatabase(): Promise<void> {
               country: 'USA',
           },
         amenities: ["free-wifi", "parking"],
-        hotelType: "Budget",
+        hotelType: "Resort",
         priceRange: "Low",
         groupSize: "Solo",
         pricePerNight: 90,
@@ -132,68 +179,8 @@ async function seedDatabase(): Promise<void> {
       checkOutDate: new Date(),
     });
 
-          // @ts-ignore
-      if (user.recommendations.hotelType.get(hotels[0].hotelType)){
-          user.recommendations.hotelType.set(hotels[0].hotelType,user.recommendations.hotelType.get(hotels[0].hotelType)+1)
-      }
-      else{
-          user.recommendations.hotelType.set(hotels[0].hotelType,1)
-      }
-
-      if (user.recommendations.priceRange.get(hotels[0].priceRange)){
-          user.recommendations.priceRange.set(hotels[0].priceRange,user.recommendations.priceRange.get(hotels[0].priceRange)+1)
-      }
-      else{
-          user.recommendations.priceRange.set(hotels[0].priceRange,1)
-      }
-
-      if (user.recommendations.groupSize.get(hotels[0].groupSize)){
-          user.recommendations.groupSize.set(hotels[0].groupSize,user.recommendations.groupSize.get(hotels[0].groupSize)+1)
-      }
-      else{
-          user.recommendations.groupSize.set(hotels[0].groupSize,1)
-      }
-
-      hotels[0].amenities.forEach((amenitie:string)=>{
-          if (user.recommendations.amenities.get(amenitie)){
-              user.recommendations.amenities.set(amenitie,user.recommendations.amenities.get(amenitie)+1)
-          }
-          else{
-              user.recommendations.amenities.set(amenitie,1)
-          }
-      })
-
-      if (user.recommendations.hotelType.get(hotels[3].hotelType)){
-          user.recommendations.hotelType.set(hotels[3].hotelType,user.recommendations.hotelType.get(hotels[3].hotelType)+1)
-      }
-      else{
-          user.recommendations.hotelType.set(hotels[3].hotelType,1)
-      }
-
-      if (user.recommendations.priceRange.get(hotels[3].priceRange)){
-          user.recommendations.priceRange.set(hotels[3].priceRange,user.recommendations.priceRange.get(hotels[3].priceRange)+1)
-      }
-      else{
-          user.recommendations.priceRange.set(hotels[3].priceRange,1)
-      }
-
-      if (user.recommendations.groupSize.get(hotels[3].groupSize)){
-          user.recommendations.groupSize.set(hotels[3].groupSize,user.recommendations.groupSize.get(hotels[3].groupSize)+1)
-      }
-      else{
-          user.recommendations.groupSize.set(hotels[3].groupSize,1)
-      }
-
-      hotels[3].amenities.forEach((amenitie:string)=>{
-          if (user.recommendations.amenities.get(amenitie)){
-              user.recommendations.amenities.set(amenitie,user.recommendations.amenities.get(amenitie)+1)
-          }
-          else{
-              user.recommendations.amenities.set(amenitie,1)
-          }
-      })
-
-
+    await fillRecommendations(user,hotels[0]);
+    await fillRecommendations(user,hotels[3]);
 
           await user.save();
 
@@ -217,4 +204,4 @@ export async function processRecommendations() {
   return null;
 }
 
-processRecommendations()
+//processRecommendations()
