@@ -11,7 +11,7 @@ export default function HotelDetailsPage({
   const { id } = params;
   const { selectedHotel } = useSelectedHotel();
 
-  if (!selectedHotel || selectedHotel.id !== parseInt(id, 10)) {
+  if (!selectedHotel) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-gray-600">

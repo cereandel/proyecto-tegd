@@ -34,6 +34,7 @@ const hotelSchema: Schema<IHotel> = new Schema(
     priceRange: { type: String, required: true, index: true },
     groupSize: { type: String, required: true, index: true },
     pricePerNight: { type: Number, required: true },
+    averageRating: { type: Number, default: 0 },
     images: {
       type: [String],
       default: ["https://placehold.co/600x400/EEE/31343C?text=Hotel"]

@@ -6,12 +6,25 @@ import { BottomNav } from "./BottomNav";
 import { useState } from "react";
 
 interface Hotel {
-  id: number;
-  name: string;
-  location: string;
-  price: string;
-  rating: number;
-  imageUrl: string;
+    _id:string;
+    name: string;
+    description: string;
+    location:{
+        city: string;
+        country: string;
+    },
+    amenities: string[];
+    hotelType: string;
+    priceRange: string;
+    groupSize: string;
+    pricePerNight: number;
+    images: string[];
+    reviews: {
+        stars: number;
+        comment: string;
+        date: Date;
+    }[];
+    averageRating: number;
 }
 
 interface ViewAllHotelsProps {
@@ -48,12 +61,12 @@ export function ViewAllHotels({ title, hotels, onBack, onHotelClick }: ViewAllHo
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {displayedHotels.map((hotel) => (
             <HotelCard
-              key={hotel.id}
+              key={hotel._id}
               name={hotel.name}
-              location={hotel.location}
-              price={hotel.price}
-              rating={hotel.rating}
-              imageUrl={hotel.imageUrl}
+              location={hotel.location.city}
+              price={hotel.pricePerNight.toString()}
+              rating={hotel.averageRating}
+              imageUrl={hotel.images[0]}
               onClick={() => onHotelClick?.(hotel)}
             />
           ))}

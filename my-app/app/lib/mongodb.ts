@@ -34,6 +34,11 @@ function checkRecommendationsMap(type: keyof IUser['recommendations'],key:string
 }
 
 
+export async function getHoteles(){
+   return await Hotel.find().exec();
+}
+
+
 export async function fillRecommendations(user:IUser,hotel:IHotel){
     try {
         if(checkRecommendationsMap('hotelType',hotel.hotelType,user)){
@@ -101,6 +106,7 @@ async function seedDatabase(): Promise<void> {
         hotelType: "Resort",
         priceRange: "Expensive",
         groupSize: "Family",
+        averageRating: 5,
         pricePerNight: 450,
       },
       {
@@ -114,7 +120,8 @@ async function seedDatabase(): Promise<void> {
         hotelType: "Boutique",
         priceRange: "Medium",
         groupSize: "Couple",
-        pricePerNight: 300,
+          averageRating: 3,
+          pricePerNight: 300,
       },
       {
         name: "Budget Stay Inn",
@@ -127,7 +134,8 @@ async function seedDatabase(): Promise<void> {
         hotelType: "Resort",
         priceRange: "Low",
         groupSize: "Solo",
-        pricePerNight: 90,
+          averageRating: 1,
+          pricePerNight: 90,
       },
       {
         name: "Oceanview Getaway",
@@ -140,7 +148,8 @@ async function seedDatabase(): Promise<void> {
         hotelType: "Resort",
         priceRange: "Medium",
         groupSize: "Couple",
-        pricePerNight: 500,
+          averageRating: 2,
+          pricePerNight: 500,
       },
       {
         name: "The Business Hub",
@@ -153,7 +162,8 @@ async function seedDatabase(): Promise<void> {
         hotelType: "Business",
         groupSize: "Group",
         priceRange: "Expensive",
-        pricePerNight: 250,
+          averageRating: 4.7,
+          pricePerNight: 250,
       },
     ]);
 

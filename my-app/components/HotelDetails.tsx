@@ -14,12 +14,25 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Hotel {
-  id: number;
-  name: string;
-  location: string;
-  price: string;
-  rating: number;
-  imageUrl: string;
+    _id:string;
+    name: string;
+    description: string;
+    location:{
+        city: string;
+        country: string;
+    },
+    amenities: string[];
+    hotelType: string;
+    priceRange: string;
+    groupSize: string;
+    pricePerNight: number;
+    images: string[];
+    reviews: {
+        stars: number;
+        comment: string;
+        date: Date;
+    }[];
+    averageRating: number;
 }
 
 interface HotelDetailsProps {
@@ -85,7 +98,7 @@ export function HotelDetails({ hotel, onBack, onReserve }: HotelDetailsProps) {
 
   // Mock data for hotel details
   const galleryImages = [
-    hotel.imageUrl,
+    hotel.images[0],
     "https://images.unsplash.com/photo-1759303690206-1dc66e9ef8ed?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3RlbCUyMGFtZW5pdGllcyUyMHNwYXxlbnwxfHx8fDE3NjA5NzkzMTV8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     "https://images.unsplash.com/photo-1543539571-2d88da875d21?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3RlbCUyMHJlc3RhdXJhbnQlMjBkaW5pbmd8ZW58MXx8fHwxNzYwOTE3ODYxfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     "https://images.unsplash.com/photo-1757889693295-27cf12654c4b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3RlbCUyMHBvb2wlMjBsb3VuZ2V8ZW58MXx8fHwxNzYwOTc5MzE2fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
@@ -126,7 +139,7 @@ export function HotelDetails({ hotel, onBack, onReserve }: HotelDetailsProps) {
       {/* Hero Image */}
       <div className="relative">
         <ImageWithFallback
-          src={hotel.imageUrl}
+          src={hotel.images[0]}
           alt={hotel.name}
           className="w-full h-80 object-cover"
         />
@@ -136,7 +149,7 @@ export function HotelDetails({ hotel, onBack, onReserve }: HotelDetailsProps) {
         >
           <div className="flex items-center gap-1">
             <Star size={16} fill="#FFD700" style={{ color: "#FFD700" }} />
-            <span className="ml-1">{hotel.rating}</span>
+            <span className="ml-1">{hotel.averageRating}</span>
           </div>
         </div>
       </div>
@@ -148,7 +161,8 @@ export function HotelDetails({ hotel, onBack, onReserve }: HotelDetailsProps) {
           <h1 className="text-gray-900 mb-2">{hotel.name}</h1>
           <div className="flex items-center gap-2 text-gray-600">
             <MapPin size={18} />
-            <span>{hotel.location}</span>
+            <span>{hotel.location.city},</span>
+            <span>{hotel.location.country}</span>
           </div>
         </div>
 
@@ -190,7 +204,6 @@ export function HotelDetails({ hotel, onBack, onReserve }: HotelDetailsProps) {
           <div className="grid grid-cols-2 gap-4">
             {amenities.map((amenity, index) => {
               const Icon = amenity.icon;
-              const isSelected = selectedAmenities.includes(index);
               return (
                 <button
                   key={index}
@@ -204,25 +217,25 @@ export function HotelDetails({ hotel, onBack, onReserve }: HotelDetailsProps) {
                   className="flex items-center gap-3 p-4 transition-all hover:scale-105 active:scale-95"
                   style={{
                     borderRadius: "20px",
-                    backgroundColor: isSelected ? "#007AFF" : "#F3F4F6",
+                    backgroundColor: "#007AFF",
                     border: "2px solid transparent",
-                    borderColor: isSelected ? "#007AFF" : "transparent",
+                    borderColor:  "#007AFF",
                   }}
                 >
                   <div
                     className="p-2 flex-shrink-0"
                     style={{
-                      backgroundColor: isSelected ? "white" : "#007AFF",
-                      opacity: isSelected ? 1 : 0.1,
+                      backgroundColor:  "white" ,
+                      opacity:  1 ,
                       borderRadius: "12px",
                     }}
                   >
-                    <Icon size={20} style={{ color: isSelected ? "#007AFF" : "#007AFF", opacity: 1 }} />
+                    <Icon size={20} style={{ color:  "#007AFF", opacity: 1 }} />
                   </div>
-                  <span className="flex-1 text-left" style={{ color: isSelected ? "white" : "#374151" }}>
+                  <span className="flex-1 text-left" style={{ color: "white"  }}>
                     {amenity.label}
                   </span>
-                  {isSelected && (
+
                     <div
                       className="flex-shrink-0 flex items-center justify-center"
                       style={{
@@ -234,7 +247,7 @@ export function HotelDetails({ hotel, onBack, onReserve }: HotelDetailsProps) {
                     >
                       <Check size={14} style={{ color: "#007AFF" }} />
                     </div>
-                  )}
+
                 </button>
               );
             })}
@@ -267,16 +280,16 @@ export function HotelDetails({ hotel, onBack, onReserve }: HotelDetailsProps) {
             <div className="flex items-center gap-4 mb-4">
               <div className="text-center">
                 <div className="text-4xl mb-1" style={{ color: "#007AFF" }}>
-                  {hotel.rating}
+                  {hotel.averageRating}
                 </div>
                 <div className="flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
                       size={14}
-                      fill={i < Math.floor(hotel.rating) ? "#FFD700" : "none"}
+                      fill={i < Math.floor(hotel.averageRating) ? "#FFD700" : "none"}
                       style={{
-                        color: i < Math.floor(hotel.rating) ? "#FFD700" : "#D1D5DB",
+                        color: i < Math.floor(hotel.averageRating) ? "#FFD700" : "#D1D5DB",
                       }}
                     />
                   ))}
@@ -303,7 +316,7 @@ export function HotelDetails({ hotel, onBack, onReserve }: HotelDetailsProps) {
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-gray-600 text-sm">Precio por noche</p>
-              <p className="text-gray-900 text-2xl">{hotel.price}</p>
+              <p className="text-gray-900 text-2xl">{hotel.pricePerNight}</p>
             </div>
             <button
               onClick={handleReserveClick}

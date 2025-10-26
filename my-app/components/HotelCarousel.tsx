@@ -3,12 +3,25 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { HotelCard } from "./HotelCard";
 
 interface Hotel {
-  id: number;
-  name: string;
-  location: string;
-  price: string;
-  rating: number;
-  imageUrl: string;
+    _id:string;
+    name: string;
+    description: string;
+    location:{
+        city: string;
+        country: string;
+    },
+    amenities: string[];
+    hotelType: string;
+    priceRange: string;
+    groupSize: string;
+    pricePerNight: number;
+    images: string[];
+    reviews: {
+        stars: number;
+        comment: string;
+        date: Date;
+    }[];
+    averageRating: number;
 }
 
 interface HotelCarouselProps {
@@ -87,15 +100,15 @@ export function HotelCarousel({
         >
           {hotels.map((hotel) => (
             <div
-              key={hotel.id}
+              key={hotel._id}
               className={`flex-shrink-0 ${featured ? "w-80" : "w-72"}`}
             >
               <HotelCard
                 name={hotel.name}
-                location={hotel.location}
-                price={hotel.price}
-                rating={hotel.rating}
-                imageUrl={hotel.imageUrl}
+                location={hotel.location.city}
+                price={hotel.pricePerNight.toString()}
+                rating={hotel.averageRating}
+                imageUrl={hotel.images[0]}
                 onClick={() => onHotelClick?.(hotel)}
               />
             </div>

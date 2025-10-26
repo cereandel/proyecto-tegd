@@ -44,8 +44,23 @@ export function HomePage({
   const handleHotelClick = (hotel: any) => {
     // store selected hotel in context so details page can access it
     setSelectedHotel(hotel);
-    navigateTo(`hotelDetails/${hotel.id}`);
+    navigateTo(`hotelDetails/${hotel._id}`);
   };
+
+  const [popularHotels,setPopularHotels] = useState()
+
+  async function getAllHoteles(){
+      const response = await fetch(`/api/hotels`, {
+          method: "GET",
+          headers: {"Content-Type": "application/json"},
+      });
+      if (response.ok) {
+          const res = await response.json();
+          setPopularHotels(res.data)
+      } else {
+          console.log('error al recibir cookie')
+      }
+  }
 
   // Handle openSearchOnMount changes
   useEffect(() => {
@@ -68,6 +83,8 @@ export function HomePage({
 
   // Register a handler so BottomNav's search button expands the search bar on this screen
   useEffect(() => {
+      getAllHoteles();
+
     const handler = () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
       setIsSearchExpanded(true);
@@ -81,6 +98,7 @@ export function HomePage({
       setBottomSearchHandler?.(undefined);
     };
   }, []);
+
   const featuredHotels = [
     {
       id: 1,
@@ -156,208 +174,7 @@ export function HomePage({
     },
   ];
 
-  const specialOffers = [
-    {
-      id: 9,
-      name: "Tropical Paradise Resort",
-      location: "Phuket, Tailandia",
-      price: "$150",
-      rating: 4.6,
-      imageUrl:
-        "https://images.unsplash.com/photo-1697216563517-e48622ba218c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0cm9waWNhbCUyMHJlc29ydCUyMHBvb2x8ZW58MXx8fHwxNzYwOTUxNTk3fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    },
-    {
-      id: 10,
-      name: "Urban Skyline Hotel",
-      location: "Nueva York, USA",
-      price: "$200",
-      rating: 4.8,
-      imageUrl:
-        "https://images.unsplash.com/photo-1716084380738-ea83a1c17716?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjaXR5JTIwaG90ZWwlMjBuaWdodHxlbnwxfHx8fDE3NjA5Nzc5NTR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    },
-    {
-      id: 11,
-      name: "Mountain View Lodge",
-      location: "Aspen, Colorado",
-      price: "$220",
-      rating: 4.7,
-      imageUrl:
-        "https://images.unsplash.com/photo-1757506417384-76c0439c97ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb3VudGFpbiUyMGxvZGdlfGVufDF8fHx8MTc2MDk3Nzk1NHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    },
-    {
-      id: 12,
-      name: "Coastal Breeze Resort",
-      location: "Maldivas",
-      price: "$350",
-      rating: 4.9,
-      imageUrl:
-        "https://images.unsplash.com/photo-1641150557653-e4c409426e59?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZXNvcnQlMjBiZWFjaCUyMGFlcmlhbHxlbnwxfHx8fDE3NjA5Nzc5NTR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    },
-    {
-      id: 13,
-      name: "Villa Tranquila",
-      location: "Tulum, México",
-      price: "$175",
-      rating: 4.6,
-      imageUrl:
-        "https://images.unsplash.com/photo-1694967832949-09984640b143?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZXNvcnQlMjB2aWxsYXxlbnwxfHx8fDE3NjA5Nzg0NDh8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    },
-    {
-      id: 14,
-      name: "Rooftop Urban Hotel",
-      location: "Singapur",
-      price: "$210",
-      rating: 4.7,
-      imageUrl:
-        "https://images.unsplash.com/photo-1720746942586-72083beaa07a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx1cmJhbiUyMGhvdGVsJTIwcm9vZnRvcHxlbnwxfHx8fDE3NjA5Nzg0NDl8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    },
-    {
-      id: 15,
-      name: "Heritage Palace Hotel",
-      location: "Jaipur, India",
-      price: "$165",
-      rating: 4.5,
-      imageUrl:
-        "https://images.unsplash.com/photo-1649731000184-7ced04998f44?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxib3V0aXF1ZSUyMGhvdGVsfGVufDF8fHx8MTc2MDg4NjQwNnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    },
-    {
-      id: 16,
-      name: "Azure Beach Club",
-      location: "Ibiza, España",
-      price: "$295",
-      rating: 4.8,
-      imageUrl:
-        "https://images.unsplash.com/photo-1729605412184-8d796f9c6f66?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiZWFjaCUyMHJlc29ydCUyMGhvdGVsfGVufDF8fHx8MTc2MDg5MDI3MXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    },
-  ];
 
-  const popularHotels = [
-    {
-      id: 17,
-      name: "Sunset Beach Resort",
-      location: "Bali, Indonesia",
-      price: "$190",
-      rating: 4.8,
-      imageUrl:
-        "https://images.unsplash.com/photo-1729605412184-8d796f9c6f66?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiZWFjaCUyMHJlc29ydCUyMGhvdGVsfGVufDF8fHx8MTc2MDg5MDI3MXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    },
-    {
-      id: 18,
-      name: "City Center Suites",
-      location: "Londres, Reino Unido",
-      price: "$240",
-      rating: 4.6,
-      imageUrl:
-        "https://images.unsplash.com/photo-1695706807850-8c66b24b3413?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBob3RlbCUyMGxvYmJ5fGVufDF8fHx8MTc2MDk3NjAwMnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    },
-    {
-      id: 19,
-      name: "Royal Palace Hotel",
-      location: "Dubai, UAE",
-      price: "$380",
-      rating: 4.9,
-      imageUrl:
-        "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3RlbCUyMHJvb218ZW58MXx8fHwxNzYwOTUwNDI5fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    },
-    {
-      id: 20,
-      name: "Alpine Retreat",
-      location: "Zermatt, Suiza",
-      price: "$300",
-      rating: 4.7,
-      imageUrl:
-        "https://images.unsplash.com/photo-1757506417384-76c0439c97ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb3VudGFpbiUyMGxvZGdlfGVufDF8fHx8MTc2MDk3Nzk1NHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    },
-    {
-      id: 21,
-      name: "Modern Sky Tower",
-      location: "Tokio, Japón",
-      price: "$310",
-      rating: 4.8,
-      imageUrl:
-        "https://images.unsplash.com/photo-1716084380738-ea83a1c17716?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjaXR5JTIwaG90ZWwlMjBuaWdodHxlbnwxfHx8fDE3NjA5Nzc5NTR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    },
-    {
-      id: 22,
-      name: "Prestige Oceanfront",
-      location: "Seychelles",
-      price: "$410",
-      rating: 4.9,
-      imageUrl:
-        "https://images.unsplash.com/photo-1641150557653-e4c409426e59?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyZXNvcnQlMjBiZWFjaCUyMGFlcmlhbHxlbnwxfHx8fDE3NjA5Nzc5NTR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    },
-    {
-      id: 23,
-      name: "Charming Boutique Stay",
-      location: "Praga, República Checa",
-      price: "$195",
-      rating: 4.7,
-      imageUrl:
-        "https://images.unsplash.com/photo-1682221568203-16f33b35e57d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxib3V0aXF1ZSUyMGhvdGVsJTIwbG9iYnl8ZW58MXx8fHwxNzYwOTIwMzY4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    },
-    {
-      id: 24,
-      name: "Tropical Pool Villa",
-      location: "Koh Samui, Tailandia",
-      price: "$235",
-      rating: 4.8,
-      imageUrl:
-        "https://images.unsplash.com/photo-1697216563517-e48622ba218c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0cm9waWNhbCUyMHJlc29ydCUyMHBvb2x8ZW58MXx8fHwxNzYwOTUxNTk3fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    },
-  ];
-
-  const popularLocations = [
-    {
-      id: 1,
-      name: "París",
-      country: "Francia",
-      hotelsCount: 342,
-      imageUrl:
-        "https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwYXJpcyUyMGVpZmZlbCUyMHRvd2VyfGVufDF8fHx8MTc2MDk2NDEwNHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    },
-    {
-      id: 2,
-      name: "Tokio",
-      country: "Japón",
-      hotelsCount: 428,
-      imageUrl:
-        "https://images.unsplash.com/photo-1602283662099-1c6c158ee94d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0b2t5byUyMGphcGFuJTIwY2l0eXxlbnwxfHx8fDE3NjA4OTQxMDJ8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    },
-    {
-      id: 3,
-      name: "Nueva York",
-      country: "Estados Unidos",
-      hotelsCount: 567,
-      imageUrl:
-        "https://images.unsplash.com/photo-1570304816841-906a17d7b067?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxuZXclMjB5b3JrJTIwc2t5bGluZXxlbnwxfHx8fDE3NjA5NzQ0NDh8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    },
-    {
-      id: 4,
-      name: "Dubai",
-      country: "Emiratos Árabes Unidos",
-      hotelsCount: 289,
-      imageUrl:
-        "https://images.unsplash.com/photo-1537132766573-55e8b870c5d6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxkdWJhaSUyMGNpdHlzY2FwZXxlbnwxfHx8fDE3NjA5NDY1MzV8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    },
-    {
-      id: 5,
-      name: "Roma",
-      country: "Italia",
-      hotelsCount: 391,
-      imageUrl:
-        "https://images.unsplash.com/photo-1555992828-ca4dbe41d294?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxyb21lJTIwY29sb3NzZXVtfGVufDF8fHx8MTc2MDkyOTExOHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    },
-    {
-      id: 6,
-      name: "Londres",
-      country: "Reino Unido",
-      hotelsCount: 512,
-      imageUrl:
-        "https://images.unsplash.com/photo-1745016176874-cd3ed3f5bfc6?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsb25kb24lMjBiaWclMjBiZW58ZW58MXx8fHwxNzYwOTQxOTA4fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-    },
-  ];
-
-  const allHotels = getMockHotels();
 
   return (
     <div className="min-h-screen bg-white pb-24">
@@ -605,7 +422,7 @@ export function HomePage({
         </div>
       </div>
 
-      {/* Featured Recommendations Carousel */}
+        {/* Featured Recommendations Carousel
       <HotelCarousel
         title="Tus Recomendaciones Destacadas"
         hotels={featuredHotels}
@@ -616,9 +433,10 @@ export function HomePage({
           onViewAllHotels?.("Tus Recomendaciones Destacadas", featuredHotels);
         }}
         onHotelClick={handleHotelClick}
-      />
+      /> */}
 
-      {/* Popular Hotels Carousel */}
+        {/*Popular Hotels Carousel*/}
+      {popularHotels && (
       <HotelCarousel
         title="Hoteles Populares"
         hotels={popularHotels}
@@ -629,8 +447,8 @@ export function HomePage({
         }}
         onHotelClick={handleHotelClick}
       />
-
-      {/* Bottom Navigation */}
+        )}
+        {/* Bottom Navigation */}
       <BottomNav activeTab={isSearchExpanded ? "search" : "home"} />
     </div>
   );

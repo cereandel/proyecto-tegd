@@ -3,12 +3,25 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
 interface Hotel {
-  id: number;
-  name: string;
-  location: string;
-  price: string;
-  rating: number;
-  imageUrl: string;
+    _id:string;
+    name: string;
+    description: string;
+    location:{
+        city: string;
+        country: string;
+    },
+    amenities: string[];
+    hotelType: string;
+    priceRange: string;
+    groupSize: string;
+    pricePerNight: number;
+    images: string[];
+    reviews: {
+        stars: number;
+        comment: string;
+        date: Date;
+    }[];
+    averageRating: number;
 }
 
 interface SelectedHotelContextType {
