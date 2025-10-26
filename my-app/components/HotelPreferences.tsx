@@ -27,10 +27,10 @@ interface HotelPreferencesProps {
 
 export function HotelPreferences({ onBack }: HotelPreferencesProps) {
   const [preferences, setPreferences] = useState({
-    hotelType: [],
+    hotelType: "",
     priceRange: "",
     groupSize: "",
-    amenities: [],
+    amenities: [] as string[],
   });
 
   async function getUserPreferences(){
@@ -122,16 +122,16 @@ export function HotelPreferences({ onBack }: HotelPreferencesProps) {
   const toggleHotelType = (id: string) => {
     setPreferences((prev) => ({
       ...prev,
-      hotelType: prev.hotelType.includes(id)
-        ? prev.hotelType.filter((t) => t !== id)
-        : [...prev.hotelType, id],
+      hotelType: prev.hotelType == id
+        ? ''
+        : id,
     }));
   };
 
   const toggleAmenity = (id: string) => {
     setPreferences((prev) => ({
-      ...prev,
-      amenities: prev.amenities.includes(id)
+        ...prev,
+        amenities: prev.amenities.includes(id)
         ? prev.amenities.filter((a) => a !== id)
         : [...prev.amenities, id],
     }));
@@ -181,7 +181,7 @@ export function HotelPreferences({ onBack }: HotelPreferencesProps) {
           </h2>
           <div className="grid grid-cols-2 gap-3">
             {hotelTypes.map((type, index) => {
-              const isSelected = preferences.hotelType.includes(type.id);
+              const isSelected = preferences.hotelType == type.id;
               return (
                 <motion.button
                   key={type.id}
