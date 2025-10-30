@@ -3,25 +3,25 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { HotelCard } from "./HotelCard";
 
 interface Hotel {
-    _id:string;
-    name: string;
-    description: string;
-    location:{
-        city: string;
-        country: string;
-    },
-    amenities: string[];
-    hotelType: string;
-    priceRange: string;
-    groupSize: string;
-    pricePerNight: number;
-    images: string[];
-    reviews: {
-        stars: number;
-        comment: string;
-        date: Date;
-    }[];
-    averageRating: number;
+  _id: string;
+  name: string;
+  description: string;
+  location: {
+    city: string;
+    country: string;
+  };
+  amenities: string[];
+  hotelType: string;
+  priceRange: string;
+  groupSize: string;
+  pricePerNight: number;
+  images: string[];
+  reviews: {
+    stars: number;
+    comment: string;
+    date: Date;
+  }[];
+  averageRating: number;
 }
 
 interface HotelCarouselProps {
@@ -98,21 +98,51 @@ export function HotelCarousel({
             scrollBehavior: "smooth",
           }}
         >
-          {hotels.map((hotel) => (
-            <div
-              key={hotel._id}
-              className={`flex-shrink-0 ${featured ? "w-80" : "w-72"}`}
-            >
-              <HotelCard
-                name={hotel.name}
-                location={hotel.location.city}
-                price={hotel.pricePerNight.toString()}
-                rating={hotel.averageRating}
-                imageUrl={hotel.images[0]}
-                onClick={() => onHotelClick?.(hotel)}
-              />
-            </div>
-          ))}
+          {hotels.map((hotel) => {
+            const resolveImage = (h: any) => {
+              const imgs = h?.images;
+              if (!imgs) return "";
+              const normalizeEntry = (e: any) => {
+                if (!e && e !== 0) return "";
+                if (typeof e === "string") return e;
+                if (typeof e === "object")
+                  return e.url ?? e.src ?? e.path ?? "";
+                return "";
+              };
+
+              if (Array.isArray(imgs)) return normalizeEntry(imgs[0]) ?? "";
+              if (typeof imgs === "object" && imgs !== null) {
+                if (typeof imgs.main === "string") return imgs.main;
+                if (Array.isArray(imgs.main))
+                  return (
+                    normalizeEntry(imgs.main[0]) ??
+                    normalizeEntry(imgs.others?.[0]) ??
+                    ""
+                  );
+                return normalizeEntry(imgs.others?.[0]) ?? "";
+              }
+              if (typeof imgs === "string") return imgs;
+              return "";
+            };
+
+            const imageSrc = resolveImage(hotel);
+
+            return (
+              <div
+                key={hotel._id}
+                className={`flex-shrink-0 ${featured ? "w-80" : "w-72"}`}
+              >
+                <HotelCard
+                  name={hotel.name}
+                  location={hotel.location.city}
+                  price={hotel.pricePerNight.toString()}
+                  rating={hotel.averageRating}
+                  imageSrc={imageSrc}
+                  onClick={() => onHotelClick?.(hotel)}
+                />
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

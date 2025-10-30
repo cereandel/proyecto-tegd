@@ -10,7 +10,8 @@ interface Location {
   name: string;
   country: string;
   hotelsCount: number;
-  imageUrl: string;
+  imageUrl?: string;
+  images?: { main?: string; others?: string[] } | string[];
 }
 
 interface ViewAllLocationsProps {
@@ -19,10 +20,16 @@ interface ViewAllLocationsProps {
   onBack: () => void;
 }
 
-export function ViewAllLocations({ title, locations, onBack }: ViewAllLocationsProps) {
+export function ViewAllLocations({
+  title,
+  locations,
+  onBack,
+}: ViewAllLocationsProps) {
   const [showAll, setShowAll] = useState(false);
   const INITIAL_DISPLAY = 8;
-  const displayedLocations = showAll ? locations : locations.slice(0, INITIAL_DISPLAY);
+  const displayedLocations = showAll
+    ? locations
+    : locations.slice(0, INITIAL_DISPLAY);
   const hasMore = locations.length > INITIAL_DISPLAY;
 
   return (
@@ -50,7 +57,13 @@ export function ViewAllLocations({ title, locations, onBack }: ViewAllLocationsP
               name={location.name}
               country={location.country}
               hotelsCount={location.hotelsCount}
-              imageUrl={location.imageUrl}
+              imageSrc={
+                (location as any).images?.main ??
+                (Array.isArray((location as any).images) &&
+                  (location as any).images[0]) ??
+                location.imageUrl ??
+                ""
+              }
             />
           ))}
         </div>
@@ -63,7 +76,7 @@ export function ViewAllLocations({ title, locations, onBack }: ViewAllLocationsP
               className="px-8 py-4 text-white transition-all hover:shadow-lg flex items-center gap-2"
               style={{
                 backgroundColor: "#007AFF",
-                borderRadius: "24px"
+                borderRadius: "24px",
               }}
             >
               <span>{showAll ? "Mostrar menos" : "Mostrar más"}</span>
@@ -74,9 +87,7 @@ export function ViewAllLocations({ title, locations, onBack }: ViewAllLocationsP
       </div>
 
       {/* Bottom Navigation */}
-      <BottomNav 
-        activeTab="home"
-      />
+      <BottomNav activeTab="home" />
     </div>
   );
 }

@@ -5,10 +5,15 @@ interface LocationCardProps {
   name: string;
   country: string;
   hotelsCount: number;
-  imageUrl: string;
+  imageSrc: string;
 }
 
-export function LocationCard({ name, country, hotelsCount, imageUrl }: LocationCardProps) {
+export function LocationCard({
+  name,
+  country,
+  hotelsCount,
+  imageSrc,
+}: LocationCardProps) {
   return (
     <div
       className="bg-white shadow-sm overflow-hidden cursor-pointer transition-all hover:shadow-lg"
@@ -17,7 +22,7 @@ export function LocationCard({ name, country, hotelsCount, imageUrl }: LocationC
       {/* Image Container */}
       <div className="relative h-40 overflow-hidden">
         <ImageWithFallback
-          src={imageUrl}
+          src={imageSrc}
           alt={name}
           className="w-full h-full object-cover transition-transform hover:scale-105"
         />
@@ -25,7 +30,8 @@ export function LocationCard({ name, country, hotelsCount, imageUrl }: LocationC
         <div
           className="absolute inset-0"
           style={{
-            background: "linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%)",
+            background:
+              "linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 60%)",
           }}
         />
         {/* Location Info on Image */}
@@ -40,7 +46,9 @@ export function LocationCard({ name, country, hotelsCount, imageUrl }: LocationC
 
       {/* Hotels Count */}
       <div className="px-4 py-3">
-        <p className="text-sm text-gray-600">{hotelsCount} hoteles disponibles</p>
+        <p className="text-sm text-gray-600">
+          {hotelsCount} hoteles disponibles
+        </p>
       </div>
     </div>
   );

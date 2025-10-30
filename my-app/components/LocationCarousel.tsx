@@ -7,7 +7,8 @@ interface Location {
   name: string;
   country: string;
   hotelsCount: number;
-  imageUrl: string;
+  imageUrl?: string;
+  images?: { main?: string; others?: string[] } | string[];
 }
 
 interface LocationCarouselProps {
@@ -16,7 +17,11 @@ interface LocationCarouselProps {
   onViewAll?: () => void;
 }
 
-export function LocationCarousel({ title, locations, onViewAll }: LocationCarouselProps) {
+export function LocationCarousel({
+  title,
+  locations,
+  onViewAll,
+}: LocationCarouselProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   const scroll = (direction: "left" | "right") => {
@@ -37,9 +42,9 @@ export function LocationCarousel({ title, locations, onViewAll }: LocationCarous
       {/* Section Header */}
       <div className="flex items-center justify-between mb-4 px-6">
         <h3 className="text-gray-900">{title}</h3>
-        <button 
+        <button
           onClick={onViewAll}
-          className="text-sm" 
+          className="text-sm"
           style={{ color: "#007AFF" }}
         >
           Ver todos
@@ -68,10 +73,10 @@ export function LocationCarousel({ title, locations, onViewAll }: LocationCarous
         <div
           ref={scrollContainerRef}
           className="flex gap-4 overflow-x-auto scrollbar-hide px-6 py-2"
-          style={{ 
-            scrollbarWidth: "none", 
+          style={{
+            scrollbarWidth: "none",
             msOverflowStyle: "none",
-            scrollBehavior: "smooth"
+            scrollBehavior: "smooth",
           }}
         >
           {locations.map((location) => (
@@ -80,7 +85,13 @@ export function LocationCarousel({ title, locations, onViewAll }: LocationCarous
                 name={location.name}
                 country={location.country}
                 hotelsCount={location.hotelsCount}
-                imageUrl={location.imageUrl}
+                imageSrc={
+                  (location as any).images?.main ??
+                  (Array.isArray((location as any).images) &&
+                    (location as any).images[0]) ??
+                  location.imageUrl ??
+                  ""
+                }
               />
             </div>
           ))}

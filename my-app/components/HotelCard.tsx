@@ -6,7 +6,7 @@ interface HotelCardProps {
   location: string;
   price: string;
   rating: number;
-  imageUrl: string;
+  imageSrc: string;
   onClick?: () => void;
 }
 
@@ -15,7 +15,7 @@ export function HotelCard({
   location,
   price,
   rating,
-  imageUrl,
+  imageSrc,
   onClick,
 }: HotelCardProps) {
   return (
@@ -29,7 +29,7 @@ export function HotelCard({
         style={{ borderRadius: "24px 24px 0 0" }}
       >
         <ImageWithFallback
-          src={imageUrl}
+          src={imageSrc}
           alt={name}
           className="w-full h-full object-cover"
         />

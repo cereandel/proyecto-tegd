@@ -7,7 +7,8 @@ interface Location {
   name: string;
   country: string;
   hotelsCount: number;
-  imageUrl: string;
+  imageUrl?: string;
+  images?: { main?: string; others?: string[] } | string[];
 }
 
 interface ViewAllLocationsContextType {

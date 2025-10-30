@@ -6,25 +6,25 @@ import { BottomNav } from "./BottomNav";
 import { useState } from "react";
 
 interface Hotel {
-    _id:string;
-    name: string;
-    description: string;
-    location:{
-        city: string;
-        country: string;
-    },
-    amenities: string[];
-    hotelType: string;
-    priceRange: string;
-    groupSize: string;
-    pricePerNight: number;
-    images: string[];
-    reviews: {
-        stars: number;
-        comment: string;
-        date: Date;
-    }[];
-    averageRating: number;
+  _id: string;
+  name: string;
+  description: string;
+  location: {
+    city: string;
+    country: string;
+  };
+  amenities: string[];
+  hotelType: string;
+  priceRange: string;
+  groupSize: string;
+  pricePerNight: number;
+  images: string[];
+  reviews: {
+    stars: number;
+    comment: string;
+    date: Date;
+  }[];
+  averageRating: number;
 }
 
 interface ViewAllHotelsProps {
@@ -34,7 +34,12 @@ interface ViewAllHotelsProps {
   onHotelClick?: (hotel: Hotel) => void;
 }
 
-export function ViewAllHotels({ title, hotels, onBack, onHotelClick }: ViewAllHotelsProps) {
+export function ViewAllHotels({
+  title,
+  hotels,
+  onBack,
+  onHotelClick,
+}: ViewAllHotelsProps) {
   const [showAll, setShowAll] = useState(false);
   const INITIAL_DISPLAY = 8;
   const displayedHotels = showAll ? hotels : hotels.slice(0, INITIAL_DISPLAY);
@@ -59,17 +64,39 @@ export function ViewAllHotels({ title, hotels, onBack, onHotelClick }: ViewAllHo
       {/* Grid Content */}
       <div className="flex-1 px-6 py-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {displayedHotels.map((hotel) => (
-            <HotelCard
-              key={hotel._id}
-              name={hotel.name}
-              location={hotel.location.city}
-              price={hotel.pricePerNight.toString()}
-              rating={hotel.averageRating}
-              imageUrl={hotel.images[0]}
-              onClick={() => onHotelClick?.(hotel)}
-            />
-          ))}
+          {displayedHotels.map((hotel) => {
+            const resolveImage = (h: any) => {
+              const imgs = h?.images;
+              if (!imgs) return "";
+              const normalizeEntry = (e: any) => {
+                if (!e && e !== 0) return "";
+                if (typeof e === "string") return e;
+                if (typeof e === "object") return e.url ?? e.src ?? e.path ?? "";
+                return "";
+              };
+
+              if (Array.isArray(imgs)) return normalizeEntry(imgs[0]) ?? "";
+              if (typeof imgs === "object" && imgs !== null) {
+                if (typeof imgs.main === "string") return imgs.main;
+                if (Array.isArray(imgs.main)) return normalizeEntry(imgs.main[0]) ?? normalizeEntry(imgs.others?.[0]) ?? "";
+                return normalizeEntry(imgs.others?.[0]) ?? "";
+              }
+              if (typeof imgs === "string") return imgs;
+              return "";
+            };
+
+            return (
+              <HotelCard
+                key={hotel._id}
+                name={hotel.name}
+                location={hotel.location.city}
+                price={hotel.pricePerNight.toString()}
+                rating={hotel.averageRating}
+                imageSrc={resolveImage(hotel)}
+                onClick={() => onHotelClick?.(hotel)}
+              />
+            );
+          })}
         </div>
 
         {/* Show More/Less Button */}
@@ -80,7 +107,7 @@ export function ViewAllHotels({ title, hotels, onBack, onHotelClick }: ViewAllHo
               className="px-8 py-4 text-white transition-all hover:shadow-lg flex items-center gap-2"
               style={{
                 backgroundColor: "#007AFF",
-                borderRadius: "24px"
+                borderRadius: "24px",
               }}
             >
               <span>{showAll ? "Mostrar menos" : "Mostrar más"}</span>
@@ -91,9 +118,7 @@ export function ViewAllHotels({ title, hotels, onBack, onHotelClick }: ViewAllHo
       </div>
 
       {/* Bottom Navigation */}
-      <BottomNav 
-        activeTab="home"
-      />
+      <BottomNav activeTab="home" />
     </div>
   );
 }

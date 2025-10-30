@@ -14,7 +14,8 @@ interface Hotel {
   location: string;
   price: string;
   rating: number;
-  imageUrl: string;
+  imageUrl?: string;
+  images?: { main?: string; others?: string[] } | string[];
 }
 
 interface FavoritesProps {
@@ -162,7 +163,7 @@ export function Favorites({ onHotelClick }: FavoritesProps) {
                       hotel={hotel}
                       onRemove={removeFavorite}
                       onClick={() => {
-                        setSelectedHotel(hotel);
+                        setSelectedHotel(hotel as any);
                         if (onHotelClick) {
                           onHotelClick(hotel);
                         } else {
@@ -245,7 +246,13 @@ function FavoriteCard({
       {/* Image */}
       <div className="relative h-48">
         <ImageWithFallback
-          src={hotel.imageUrl}
+          src={
+            (hotel as any).images?.main ??
+            (Array.isArray((hotel as any).images) &&
+              (hotel as any).images[0]) ??
+            hotel.imageUrl ??
+            ""
+          }
           alt={hotel.name}
           className="w-full h-full object-cover"
         />

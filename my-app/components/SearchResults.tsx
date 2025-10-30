@@ -14,7 +14,9 @@ interface Hotel {
   location: string;
   price: string;
   rating: number;
-  imageUrl: string;
+  // support both the old imageUrl and the new images.main structure
+  imageUrl?: string;
+  images?: { main?: string; others?: string[] } | string[];
 }
 
 interface SearchResultsProps {
@@ -182,7 +184,14 @@ export function SearchResults({
                   location={hotel.location}
                   price={hotel.price}
                   rating={hotel.rating}
-                  imageUrl={hotel.imageUrl}
+                  imageSrc={
+                    // prefer images.main, fall back to array first item, then legacy imageUrl
+                    (hotel as any).images?.main ??
+                    (Array.isArray((hotel as any).images) &&
+                      (hotel as any).images[0]) ??
+                    hotel.imageUrl ??
+                    ""
+                  }
                   onClick={() => onHotelClick?.(hotel)}
                 />
               ))}

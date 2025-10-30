@@ -3,7 +3,7 @@ import mongoose, { Schema, Document } from "mongoose";
 export interface IHotel extends Document {
   name: string;
   description: string;
-  location:{
+  location: {
     city: string;
     country: string;
   },
@@ -12,7 +12,7 @@ export interface IHotel extends Document {
   priceRange: string;
   groupSize: string;
   pricePerNight: number;
-  images: string[];
+  images: { main?: string; others?: string[] };
   reviews: {
     stars: number;
     comment: string;
@@ -26,8 +26,8 @@ const hotelSchema: Schema<IHotel> = new Schema(
     name: { type: String, required: true, trim: true },
     description: { type: String, required: true },
     location: {
-      city: { type: String, required: true},
-      country: { type: String, required: true},
+      city: { type: String, required: true },
+      country: { type: String, required: true },
     },
     amenities: { type: [String], required: true, index: true },
     hotelType: { type: String, required: true, index: true },
@@ -36,8 +36,14 @@ const hotelSchema: Schema<IHotel> = new Schema(
     pricePerNight: { type: Number, required: true },
     averageRating: { type: Number, default: 0 },
     images: {
-      type: [String],
-      default: ["https://placehold.co/600x400/EEE/31343C?text=Hotel"]
+      main: {
+        type: String,
+        default: ""
+      },
+      others: {
+        type: [String],
+        default: [],
+      },
     },
   },
   {
