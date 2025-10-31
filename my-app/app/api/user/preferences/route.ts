@@ -35,9 +35,9 @@ export async function PATCH(request: NextRequest) {
     }
 
     const safeUser = session.safeUser;
-    safeUser.preferences.hotelType = updated.preferences.hotelType[0];
-    safeUser.preferences.priceRange = updated.preferences.priceRange[0];
-    safeUser.preferences.groupSize = updated.preferences.groupSize[0];
+    safeUser.preferences.hotelType = updated.preferences.hotelType;
+    safeUser.preferences.priceRange = updated.preferences.priceRange;
+    safeUser.preferences.groupSize = updated.preferences.groupSize;
     safeUser.preferences.amenities = [...updated.preferences.amenities];
 
     const expires = new Date(safeUser.expires);

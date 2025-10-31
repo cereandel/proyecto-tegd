@@ -48,6 +48,7 @@ export function HomePage({
   };
 
   const [popularHotels,setPopularHotels] = useState()
+  const [recommendedHotels,setRecommendedHotels] = useState()
 
   async function getAllHoteles(){
       const response = await fetch(`/api/hotels`, {
@@ -56,7 +57,8 @@ export function HomePage({
       });
       if (response.ok) {
           const res = await response.json();
-          setPopularHotels(res.data)
+          setPopularHotels(res.data);
+          setRecommendedHotels(res.recommended);
       } else {
           console.log('error al recibir cookie')
       }
@@ -422,19 +424,19 @@ export function HomePage({
         </div>
       </div>
 
-        {/* Featured Recommendations Carousel
+        {recommendedHotels && (
       <HotelCarousel
         title="Tus Recomendaciones Destacadas"
-        hotels={featuredHotels}
+        hotels={recommendedHotels}
         featured={true}
         onViewAll={() => {
-          setViewAll("Tus Recomendaciones Destacadas", featuredHotels);
+          setViewAll("Tus Recomendaciones Destacadas", recommendedHotels);
           navigateTo("viewAll");
-          onViewAllHotels?.("Tus Recomendaciones Destacadas", featuredHotels);
+          onViewAllHotels?.("Tus Recomendaciones Destacadas", recommendedHotels);
         }}
         onHotelClick={handleHotelClick}
-      /> */}
-
+      />
+        )}
         {/*Popular Hotels Carousel*/}
       {popularHotels && (
       <HotelCarousel

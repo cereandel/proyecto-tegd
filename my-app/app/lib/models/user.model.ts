@@ -4,10 +4,11 @@ export interface IUser extends Document {
   name: string;
   email: string;
   password: string;
+  city: string;
   preferences: {
-    hotelType: string[];
-    priceRange: string[];
-    groupSize: string[];
+    hotelType: string;
+    priceRange: string;
+    groupSize: string;
     amenities: string[];
   };
   recommendations:{
@@ -31,22 +32,23 @@ const userSchema: Schema<IUser> = new Schema(
       lowercase: true,
     },
     password: { type: String, required: true },
+    city: { type: String, required: true, default: 'Miami' },
     sessionToken: { type: String },
     preferences: {
       hotelType: {
-        type: [String],
+        type: String,
         enum: ["Resort", "Boutique", "Business", "Family"],
-        default: ["Resort"],
+        default: "Resort",
       },
       priceRange: {
-        type: [String],
+        type: String,
         enum: ["Low", "Medium", "Expensive"],
-        default: ["Medium"],
+        default: "Medium",
       },
       groupSize: {
-        type: [String],
+        type: String,
         enum: ["Solo", "Couple", "Family", "Group"],
-        default: ["Couple"],
+        default: "Couple",
       },
       amenities: {
         type: [String],

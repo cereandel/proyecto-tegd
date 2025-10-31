@@ -52,9 +52,9 @@ export async function POST(request: NextRequest) {
       username: user.name,
       email: user.email,
       preferences: {
-          hotelType: user.preferences.hotelType[0],
-          priceRange: user.preferences.priceRange[0],
-          groupSize: user.preferences.groupSize[0],
+          hotelType: user.preferences.hotelType,
+          priceRange: user.preferences.priceRange,
+          groupSize: user.preferences.groupSize,
           amenities: [...user.preferences.amenities]
       }
     };

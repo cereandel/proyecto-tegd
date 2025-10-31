@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, {FilterQuery} from "mongoose";
 import User, { IUser } from "./models/user.model";
 import Hotel, { IHotel } from "./models/hotel.model";
 import Booking from "./models/booking.model";
@@ -67,6 +67,117 @@ function checkRecommendationsMap(
 export async function getHoteles() {
   return await Hotel.find().exec();
 }
+
+const getHighestScore = (map: Map<string, number>): number => {
+    if (map.size === 0) {
+        return 0;
+    }
+    return Math.max(...Array.from(map.values()));
+};
+
+
+export async function getRecommendedHoteles(user: IUser) {
+    const noValuesGreaterThan5 = Object.values(user.recommendations).every(map =>
+        Array.from(map.values()).every(score => score < 5)
+    );
+
+    const hasPreferences = user.preferences.hotelType ||
+        user.preferences.priceRange ||
+        user.preferences.groupSize ||
+        (user.preferences.amenities && user.preferences.amenities.length > 0)
+
+    if(hasPreferences){
+        return await getRecommendedHotelesPreferencias(user)
+    }
+
+    if(!noValuesGreaterThan5){
+        const maxTypesScore = Math.max(
+            getHighestScore(user.recommendations.hotelType),
+            getHighestScore(user.recommendations.priceRange),
+            getHighestScore(user.recommendations.groupSize)
+        );
+        const maxAmenitiesScore = getHighestScore(user.recommendations.amenities);
+
+        if(maxAmenitiesScore>=maxTypesScore){
+            return await getRecommendedHotelesAmenities(user);
+        }
+        else {
+            return await getRecommendedHotelesTipo(user);
+        }
+    }
+
+    if(noValuesGreaterThan5 && !hasPreferences){
+       return await getRecommendedHotelesLocation(user)
+    }
+
+}
+
+export async function getRecommendedHotelesLocation(user: IUser) {
+    return await Hotel.find({ 'location.city':user.city}).sort({averageRating: -1}).exec();
+}
+
+export async function getRecommendedHotelesPreferencias(user: IUser) {
+    const query: FilterQuery<IHotel> = {};
+
+    if (user.preferences.hotelType) {
+        query.hotelType = user.preferences.hotelType;
+    }
+    if (user.preferences.priceRange) {
+        query.priceRange = user.preferences.priceRange;
+    }
+    if (user.preferences.groupSize) {
+        query.groupSize = user.preferences.groupSize;
+    }
+    if (user.preferences.amenities && user.preferences.amenities.length > 0) {
+        query.amenities = { $all: user.preferences.amenities };
+    }
+    return await Hotel.find(query).sort({ averageRating: -1 }).exec()
+}
+
+
+export async function getRecommendedHotelesTipo(user: IUser) {
+    const query: FilterQuery<IHotel> = {};
+
+    const typeEntries = Array.from(user.recommendations.hotelType.entries());
+    const priceEntries = Array.from(user.recommendations.priceRange.entries());
+    const groupEntries = Array.from(user.recommendations.groupSize.entries());
+    const sortedRecommendedTypes = typeEntries
+        .filter(([type, score]) => score >= 5)
+        .sort((a, b) => b[1] - a[1]);
+    const sortedRecommendedGroups = groupEntries
+        .filter(([type, score]) => score >= 5)
+        .sort((a, b) => b[1] - a[1]);
+    const sortedRecommendedPrices = priceEntries
+        .filter(([type, score]) => score >= 5)
+        .sort((a, b) => b[1] - a[1]);
+    const typesToQuery = sortedRecommendedTypes.slice(0,3).map(([type, score]) => type);
+    const groupsToQuery = sortedRecommendedGroups.slice(0,3).map(([type, score]) => type);
+    const pricesToQuery = sortedRecommendedPrices.slice(0,3).map(([type, score]) => type);
+
+    if (typesToQuery.length > 0) {
+        query.hotelType = typesToQuery;
+    }
+    if (groupsToQuery.length > 0) {
+        query.groupSize = groupsToQuery;
+    }
+    if (pricesToQuery.length > 0) {
+        query.priceRange = pricesToQuery;
+    }
+
+    return await Hotel.find(query).sort({ averageRating: -1 }).exec();
+}
+
+
+export async function getRecommendedHotelesAmenities(user: IUser) {
+    const amenitiesEntries = Array.from(user.recommendations.amenities.entries());
+    const sortedRecommendedAmenities = amenitiesEntries
+        .filter(([type, score]) => score >= 5)
+        .sort((a, b) => b[1] - a[1]);
+    const amenitiesToQuery = sortedRecommendedAmenities.slice(0,3).map(([type, score]) => type);
+    const query = {amenities: {$in: amenitiesToQuery}}
+    return await Hotel.find(query).sort({ averageRating: -1 }).exec();
+}
+
 
 export async function fillRecommendations(user: IUser, hotel: IHotel) {
   try {
@@ -253,8 +364,10 @@ async function seedDatabase(): Promise<void> {
 }
 
 export async function processRecommendations() {
+    await connectDB();
   await seedDatabase();
+  await disconnectDB();
   return null;
 }
 
-processRecommendations();
+//processRecommendations();

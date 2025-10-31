@@ -75,9 +75,9 @@ export function HotelPreferences({ onBack }: HotelPreferencesProps) {
         if (data?.preferences) {
             setPreferences((prev) => ({
                 ...prev,
-                hotelType: data.preferences.hotelType[0],
-                priceRange: data.preferences.priceRange[0],
-                groupSize: data.preferences.groupSize[0],
+                hotelType: data.preferences.hotelType,
+                priceRange: data.preferences.priceRange,
+                groupSize: data.preferences.groupSize,
                 amenities: data.preferences.amenities,
             }));
         }
