@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { connectDB } from "@/app/lib/mongodb";
 import User from "@/app/lib/models/user.model";
-import { randomUUID } from "crypto";
 import { encrypt, generateSHA256Hash } from "@/app/lib/auth/auth";
 
 export async function POST(request: NextRequest) {

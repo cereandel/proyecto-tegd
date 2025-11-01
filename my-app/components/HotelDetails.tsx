@@ -113,26 +113,40 @@ export function HotelDetails({ hotel, onBack, onReserve }: HotelDetailsProps) {
     setShowTermsModal(false);
     setIsReserving(true);
 
-    // Simulate loading
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    const now = new Date();
+    const checkInDate = now;
+    const checkOutDate = new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000);
 
-    setIsReserving(false);
+    function getCookie(name: string) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop()?.split(";").shift();
+      return null;
+    }
+    const userId = getCookie("userId");
 
-    // Para simular error al reservar, descomenta la siguiente línea:
-    // const hasError = hotel.id === 1;
-    const hasError = false;
-
-    if (hasError) {
+    try {
+      await fetch("/api/bookings", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId,
+          hotelId: hotel._id,
+          checkInDate,
+          checkOutDate,
+        }),
+      });
+      setIsReserving(false);
+      setReservationComplete(true);
+      setTimeout(() => {
+        onReserve();
+      }, 2000);
+    } catch (error) {
+      setIsReserving(false);
       setShowReservationError(true);
       setTimeout(() => {
         setShowReservationError(false);
       }, 3000);
-    } else {
-      setReservationComplete(true);
-      // Show success for 2 seconds then call onReserve
-      setTimeout(() => {
-        onReserve();
-      }, 2000);
     }
   };
 

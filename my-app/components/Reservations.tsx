@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { BottomNav } from "./BottomNav";
-import { useState } from "react";
+import React, { useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -33,7 +33,7 @@ import { useNavigation } from "../contexts/NavigationContext";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Reservation {
-  id: number;
+  id: string | number;
   hotelName: string;
   location: string;
   // support both the legacy imageUrl and a possible images.main field
@@ -74,155 +74,102 @@ export function Reservations() {
   const [showAllHistory, setShowAllHistory] = useState(false);
   const [upcomingReservations, setUpcomingReservations] = useState<
     Reservation[]
-  >([
-    {
-      id: 1,
-      hotelName: "Ocean View Paradise",
-      location: "Miami Beach, USA",
-      imageUrl:
-        "https://images.unsplash.com/photo-1729605412184-8d796f9c6f66?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiZWFjaCUyMHJlc29ydCUyMGhvdGVsfGVufDF8fHx8MTc2MDg5MDI3MXww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-      checkIn: "25 Oct, 2025",
-      checkOut: "28 Oct, 2025",
-      confirmationNumber: "SW-2025-4892",
-      status: "upcoming",
-      nights: 3,
-      price: "$960",
-      tags: getHotelTags(1),
-    },
-    {
-      id: 2,
-      hotelName: "Boutique Casa Blanca",
-      location: "Barcelona, España",
-      imageUrl:
-        "https://images.unsplash.com/photo-1649731000184-7ced04998f44?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxib3V0aXF1ZSUyMGhvdGVsfGVufDF8fHx8MTc2MDg4NjQwNnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-      checkIn: "5 Nov, 2025",
-      checkOut: "9 Nov, 2025",
-      confirmationNumber: "SW-2025-4903",
-      status: "upcoming",
-      nights: 4,
-      price: "$1,120",
-      tags: getHotelTags(2),
-    },
-  ]);
+  >([]);
+  const [pastReservations, setPastReservations] = useState<Reservation[]>([]);
 
-  const handleRemoveReservation = (id: number) => {
+  React.useEffect(() => {
+    fetch(`/api/bookings`)
+      .then((res) => res.json())
+      .then((data) => {
+        const raw = data?.bookings ?? [];
+        const mapped = raw.map((r: any) => ({
+          id: r._id,
+          hotelName: r.hotelName ?? "Hotel",
+          location:
+            (r.location && typeof r.location === "string" && r.location) || "",
+          imageUrl:
+            r.imageUrl ??
+            (Array.isArray(r.hotel?.images)
+              ? r.hotel?.images[0]
+              : (r.hotel?.images as any)?.main) ??
+            "",
+          checkIn: r.checkInDate
+            ? new Date(r.checkInDate).toLocaleDateString()
+            : "",
+          checkOut: r.checkOutDate
+            ? new Date(r.checkOutDate).toLocaleDateString()
+            : "",
+          confirmationNumber: r.confirmationNumber ?? "",
+          status: "upcoming",
+          nights:
+            r.checkInDate && r.checkOutDate
+              ? Math.ceil(
+                  (new Date(r.checkOutDate).getTime() -
+                    new Date(r.checkInDate).getTime()) /
+                    (1000 * 60 * 60 * 24)
+                )
+              : 0,
+          price: r.price ?? "",
+          tags: getHotelTags(r.hotelId ?? 1),
+        }));
+        setUpcomingReservations(mapped);
+      })
+      .catch((err) => {
+        console.error(
+          "Error fetching bookings for reservations component:",
+          err
+        );
+      });
+  }, []);
+
+  const handleRemoveReservation = (id: string | number) => {
     setUpcomingReservations((prev) => prev.filter((r) => r.id !== id));
   };
 
-  const pastReservations: Reservation[] = [
-    {
-      id: 3,
-      hotelName: "Grand Luxury Resort",
-      location: "Cancún, México",
-      imageUrl:
-        "https://images.unsplash.com/photo-1578683010236-d716f9a3f461?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3RlbCUyMHJvb218ZW58MXx8fHwxNzYwOTUwNDI5fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-      checkIn: "15 Sep, 2025",
-      checkOut: "20 Sep, 2025",
-      confirmationNumber: "SW-2025-4721",
-      status: "completed",
-      nights: 5,
-      price: "$1,250",
-      tags: getHotelTags(3),
-    },
-    {
-      id: 4,
-      hotelName: "Metropolitan Hotel",
-      location: "Ciudad de México, México",
-      imageUrl:
-        "https://images.unsplash.com/photo-1695706807850-8c66b24b3413?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb2Rlcm4lMjBob3RlbCUyMGxvYmJ5fGVufDF8fHx8MTc2MDk3NjAwMnww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-      checkIn: "1 Aug, 2025",
-      checkOut: "3 Aug, 2025",
-      confirmationNumber: "SW-2025-4512",
-      status: "completed",
-      nights: 2,
-      price: "$360",
-      tags: getHotelTags(4),
-    },
-    {
-      id: 5,
-      hotelName: "Infinity Pool Sanctuary",
-      location: "Santorini, Grecia",
-      imageUrl:
-        "https://images.unsplash.com/photo-1744352030314-a48c8feeee2b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxob3RlbCUyMGluZmluaXR5JTIwcG9vbHxlbnwxfHx8fDE3NjA5Nzg0NDh8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-      checkIn: "10 Jul, 2025",
-      checkOut: "17 Jul, 2025",
-      confirmationNumber: "SW-2025-4302",
-      status: "completed",
-      nights: 7,
-      price: "$2,940",
-      tags: getHotelTags(5),
-    },
-    {
-      id: 6,
-      hotelName: "Luxury Suite Collection",
-      location: "París, Francia",
-      imageUrl:
-        "https://images.unsplash.com/photo-1731336478850-6bce7235e320?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsdXh1cnklMjBob3RlbCUyMGJlZHJvb218ZW58MXx8fHwxNzYwOTA5MTc3fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-      checkIn: "20 Jun, 2025",
-      checkOut: "25 Jun, 2025",
-      confirmationNumber: "SW-2025-4156",
-      status: "completed",
-      nights: 5,
-      price: "$1,950",
-      tags: getHotelTags(6),
-    },
-    {
-      id: 7,
-      hotelName: "Coastal Villa Resort",
-      location: "Amalfi, Italia",
-      imageUrl:
-        "https://images.unsplash.com/photo-1709744873177-714d7ab0fe02?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2FzdGFsJTIwaG90ZWwlMjB2aWV3fGVufDF8fHx8MTc2MDk3ODQ1MHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-      checkIn: "5 May, 2025",
-      checkOut: "10 May, 2025",
-      confirmationNumber: "SW-2025-3892",
-      status: "completed",
-      nights: 5,
-      price: "$1,750",
-      tags: getHotelTags(7),
-    },
-    {
-      id: 8,
-      hotelName: "Tropical Paradise Resort",
-      location: "Phuket, Tailandia",
-      imageUrl:
-        "https://images.unsplash.com/photo-1697216563517-e48622ba218c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx0cm9waWNhbCUyMHJlc29ydCUyMHBvb2x8ZW58MXx8fHwxNzYwOTUxNTk3fDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-      checkIn: "15 Apr, 2025",
-      checkOut: "22 Apr, 2025",
-      confirmationNumber: "SW-2025-3654",
-      status: "completed",
-      nights: 7,
-      price: "$1,050",
-      tags: getHotelTags(8),
-    },
-    {
-      id: 9,
-      hotelName: "Urban Skyline Hotel",
-      location: "Nueva York, USA",
-      imageUrl:
-        "https://images.unsplash.com/photo-1716084380738-ea83a1c17716?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjaXR5JTIwaG90ZWwlMjBuaWdodHxlbnwxfHx8fDE3NjA5Nzc5NTR8MA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-      checkIn: "1 Mar, 2025",
-      checkOut: "4 Mar, 2025",
-      confirmationNumber: "SW-2025-3321",
-      status: "completed",
-      nights: 3,
-      price: "$600",
-      tags: getHotelTags(9),
-    },
-    {
-      id: 10,
-      hotelName: "Mountain View Lodge",
-      location: "Aspen, Colorado",
-      imageUrl:
-        "https://images.unsplash.com/photo-1757506417384-76c0439c97ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxtb3VudGFpbiUyMGxvZGdlfGVufDF8fHx8MTc2MDk3Nzk1NHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-      checkIn: "10 Feb, 2025",
-      checkOut: "15 Feb, 2025",
-      confirmationNumber: "SW-2025-3102",
-      status: "completed",
-      nights: 5,
-      price: "$1,100",
-      tags: getHotelTags(10),
-    },
-  ];
+  React.useEffect(() => {
+
+    fetch(`/api/bookings/history`)
+      .then((res) => res.json())
+      .then((data) => {
+        const raw = data?.bookings ?? [];
+        const mapped = raw.map((r: any) => ({
+          id: r._id,
+          hotelName: r.hotelName ?? "Hotel",
+          location:
+            (r.location && typeof r.location === "string" && r.location) || "",
+          imageUrl:
+            r.imageUrl ??
+            (Array.isArray(r.hotel?.images)
+              ? r.hotel?.images[0]
+              : (r.hotel?.images as any)?.main) ??
+            "",
+          checkIn: r.checkInDate
+            ? new Date(r.checkInDate).toLocaleDateString()
+            : "",
+          checkOut: r.checkOutDate
+            ? new Date(r.checkOutDate).toLocaleDateString()
+            : "",
+          confirmationNumber: r.confirmationNumber ?? "",
+          status: "completed",
+          nights:
+            r.checkInDate && r.checkOutDate
+              ? Math.ceil(
+                  (new Date(r.checkOutDate).getTime() -
+                    new Date(r.checkInDate).getTime()) /
+                    (1000 * 60 * 60 * 24)
+                )
+              : 0,
+          price: r.price ?? "",
+          tags: getHotelTags(
+            r.hotelId ?? (r.hotel?._id ? Number(r.hotel._id) : 1)
+          ),
+        }));
+        setPastReservations(mapped);
+      })
+      .catch((err) => {
+        console.error("Error fetching past bookings:", err);
+      });
+  }, []);
 
   // Show only first 6 past reservations unless expanded (2 rows of 3)
   const displayedPastReservations = showAllHistory
@@ -364,7 +311,7 @@ export function Reservations() {
   );
 }
 
-// Reservation Card Component
+
 function ReservationCard({
   reservation,
   isUpcoming,
@@ -372,7 +319,7 @@ function ReservationCard({
 }: {
   reservation: Reservation;
   isUpcoming: boolean;
-  onRemove?: (id: number) => void;
+  onRemove?: (id: string | number) => void;
 }) {
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -383,33 +330,44 @@ function ReservationCard({
   const handleCancelReservation = () => {
     setIsCanceling(true);
 
-    // Simular proceso de cancelación con 3 etapas
-    setTimeout(() => {
-      setIsCanceling(false);
+    (async () => {
+      try {
+        const res = await fetch(`/api/bookings/${reservation.id}`, {
+          method: "DELETE",
+          credentials: "same-origin",
+        });
 
-      // Para simular error de cancelación, descomenta la siguiente línea:
-      // const hasError = reservation.id === 1;
-      const hasError = false;
+        setIsCanceling(false);
 
-      if (hasError) {
+        if (!res.ok) {
+
+          setShowCancelError(true);
+          setTimeout(() => {
+            setShowCancelError(false);
+            setShowCancelModal(false);
+          }, 3000);
+          return;
+        }
+
+
+        setIsCanceled(true);
+        setTimeout(() => {
+          setShowCancelModal(false);
+
+          setTimeout(() => {
+            if (onRemove) onRemove(reservation.id);
+          }, 300);
+        }, 1200);
+      } catch (e) {
+        console.error("Cancel booking error:", e);
+        setIsCanceling(false);
         setShowCancelError(true);
         setTimeout(() => {
           setShowCancelError(false);
           setShowCancelModal(false);
         }, 3000);
-      } else {
-        setIsCanceled(true);
-        setTimeout(() => {
-          setShowCancelModal(false);
-          // Esperar a que se cierre el modal antes de remover
-          setTimeout(() => {
-            if (onRemove) {
-              onRemove(reservation.id);
-            }
-          }, 300);
-        }, 1500);
       }
-    }, 2000);
+    })();
   };
 
   return (
