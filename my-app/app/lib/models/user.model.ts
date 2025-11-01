@@ -37,17 +37,17 @@ const userSchema: Schema<IUser> = new Schema(
     preferences: {
       hotelType: {
         type: String,
-        enum: ["Resort", "Boutique", "Business", "Family"],
+        enum: ["Resort","", "Boutique", "Business", "Family"],
         default: "Resort",
       },
       priceRange: {
         type: String,
-        enum: ["Low", "Medium", "Expensive"],
+        enum: ["Low","", "Medium", "Expensive"],
         default: "Medium",
       },
       groupSize: {
         type: String,
-        enum: ["Solo", "Couple", "Family", "Group"],
+        enum: ["Solo","", "Couple", "Family", "Group"],
         default: "Couple",
       },
       amenities: {

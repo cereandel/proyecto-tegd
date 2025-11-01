@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { connectDB } from "@/app/lib/mongodb";
+import {connectDB, fillRecommendations} from "@/app/lib/mongodb";
 import Booking from "@/app/lib/models/booking.model";
 import Hotel from "@/app/lib/models/hotel.model";
 import { getSession } from "@/app/lib/auth/auth";
+import User from "@/app/lib/models/user.model";
 
 export async function POST(request: Request) {
     await connectDB();
@@ -28,6 +29,10 @@ export async function POST(request: Request) {
             checkInDate: new Date(checkInDate),
             checkOutDate: new Date(checkOutDate)
         });
+
+        const user= await User.findById(userId);
+        const hotel = await Hotel.findById(hotelId);
+        await fillRecommendations(user,hotel);
         return NextResponse.json(booking);
     } catch (error) {
         console.error("Error creating booking:", error);
