@@ -14,8 +14,6 @@ interface Hotel {
   location: string;
   price: string;
   rating: number;
-  // support both the old imageUrl and the new images.main structure
-  imageUrl?: string;
   images?: { main?: string; others?: string[] } | string[];
 }
 
@@ -177,24 +175,37 @@ export function SearchResults({
               {hotels.length === 1 ? "hotel" : "hoteles"}
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {hotels.map((hotel) => (
-                <HotelCard
-                  key={hotel.id}
-                  name={hotel.name}
-                  location={hotel.location}
-                  price={hotel.price}
-                  rating={hotel.rating}
-                  imageSrc={
-                    // prefer images.main, fall back to array first item, then legacy imageUrl
-                    (hotel as any).images?.main ??
-                    (Array.isArray((hotel as any).images) &&
-                      (hotel as any).images[0]) ??
-                    hotel.imageUrl ??
-                    ""
-                  }
-                  onClick={() => onHotelClick?.(hotel)}
-                />
-              ))}
+              {hotels.map((hotel) => {
+                const h = hotel as any;
+                const mappedHotel = {
+                  id:
+                    h.id ||
+                    (h._id ? h._id.toString() : Math.random().toString()),
+                  name: h.name,
+                  location:
+                    h.location && typeof h.location === "object"
+                      ? `${h.location.city ?? ""}, ${h.location.country ?? ""}`
+                      : h.location ?? "",
+                  price:
+                    h.price ?? (h.pricePerNight ? `$${h.pricePerNight}` : ""),
+                  rating: h.rating ?? h.averageRating ?? 0,
+                  imageSrc:
+                    h.images?.main ??
+                    (Array.isArray(h.images) && h.images[0]) ??
+                    "",
+                };
+                return (
+                  <HotelCard
+                    key={mappedHotel.id}
+                    name={mappedHotel.name}
+                    location={mappedHotel.location}
+                    price={mappedHotel.price}
+                    rating={mappedHotel.rating}
+                    imageSrc={mappedHotel.imageSrc}
+                    onClick={() => onHotelClick?.(hotel)}
+                  />
+                );
+              })}
             </div>
           </>
         ) : (
