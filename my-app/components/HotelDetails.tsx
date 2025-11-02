@@ -85,6 +85,15 @@ const AMENITY_OPTIONS = [
 
 export function HotelDetails({ hotel, onBack, onReserve }: HotelDetailsProps) {
   const [isFavorite, setIsFavorite] = useState(false);
+  const [nights, setNights] = useState<number>(7);
+  const formatDateInput = (d: Date) => {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  };
+  const todayStr = formatDateInput(new Date());
+  const [checkIn, setCheckIn] = useState<string>(todayStr);
 
   const hotelTags = getTagsFromHotel(hotel);
 
@@ -98,8 +107,11 @@ export function HotelDetails({ hotel, onBack, onReserve }: HotelDetailsProps) {
     });
   };
 
-  // Start with no amenities selected; user will select to mark them
-  const [selectedAmenities, setSelectedAmenities] = useState<number[]>([]);
+  const [selectedAmenities, setSelectedAmenities] = useState<number[]>(() =>
+    AMENITY_OPTIONS.map((_, i) => (isAmenityAvailable(i) ? i : -1)).filter(
+      (i) => i !== -1
+    )
+  );
   const [showTermsModal, setShowTermsModal] = useState(false);
   const [isReserving, setIsReserving] = useState(false);
   const [reservationComplete, setReservationComplete] = useState(false);
@@ -113,27 +125,24 @@ export function HotelDetails({ hotel, onBack, onReserve }: HotelDetailsProps) {
     setShowTermsModal(false);
     setIsReserving(true);
 
-    const now = new Date();
-    const checkInDate = now;
-    const checkOutDate = new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000);
-
-    function getCookie(name: string) {
-      const value = `; ${document.cookie}`;
-      const parts = value.split(`; ${name}=`);
-      if (parts.length === 2) return parts.pop()?.split(";").shift();
-      return null;
-    }
-    const userId = getCookie("userId");
+    // Parse the YYYY-MM-DD input as a local date (avoid Date("YYYY-MM-DD") which is parsed as UTC)
+    const [y, m, d] = checkIn.split("-").map((v) => Number(v));
+    const checkInDate = new Date(y, (m || 1) - 1, d || 1);
+    // Add nights in local time to avoid timezone shifts (use setDate)
+    const checkOutDate = new Date(checkInDate);
+    checkOutDate.setDate(checkOutDate.getDate() + nights);
 
     try {
       await fetch("/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
         body: JSON.stringify({
-          userId,
           hotelId: hotel._id,
-          checkInDate,
-          checkOutDate,
+          checkInDate: checkInDate.toISOString(),
+          checkOutDate: checkOutDate.toISOString(),
+          nights,
+          services: selectedAmenities.map((i) => AMENITY_OPTIONS[i].label),
         }),
       });
       setIsReserving(false);
@@ -307,22 +316,12 @@ export function HotelDetails({ hotel, onBack, onReserve }: HotelDetailsProps) {
               return (
                 <button
                   key={index}
-                  onClick={() => {
-                    if (!available) return;
-                    setSelectedAmenities((prev) =>
-                      prev.includes(index)
-                        ? prev.filter((i) => i !== index)
-                        : [...prev, index]
-                    );
-                  }}
-                  disabled={!available}
-                  aria-disabled={!available}
+                  // Make services non-interactive: available amenities are pre-selected
+                  // and cannot be deselected by the user. Unavailable remain disabled.
+                  disabled={true}
+                  aria-disabled={true}
                   aria-pressed={isSelected}
-                  className={`flex items-center gap-3 p-4 transition-all ${
-                    available
-                      ? "hover:scale-105 active:scale-95 cursor-pointer"
-                      : "cursor-not-allowed"
-                  }`}
+                  className={`flex items-center gap-3 p-4`}
                   style={{
                     borderRadius: "20px",
                     backgroundColor: isUnavailable
@@ -331,6 +330,7 @@ export function HotelDetails({ hotel, onBack, onReserve }: HotelDetailsProps) {
                       ? "#007AFF"
                       : "white",
                     border: "none",
+                    cursor: "default",
                   }}
                 >
                   <div
@@ -458,6 +458,32 @@ export function HotelDetails({ hotel, onBack, onReserve }: HotelDetailsProps) {
           <div>
             <p className="text-gray-600 text-sm">Precio por noche</p>
             <p className="text-gray-900 text-2xl">{hotel.pricePerNight}</p>
+          </div>
+          <div className="flex flex-col items-end gap-2">
+            <label className="text-sm text-gray-600">Check-in</label>
+            <input
+              type="date"
+              value={checkIn}
+              min={todayStr}
+              onChange={(e) => setCheckIn(e.target.value)}
+              className="w-40 text-center py-2 rounded-lg border border-gray-200 bg-white"
+            />
+            <label className="text-sm text-gray-600">Noches</label>
+            <input
+              type="number"
+              min={1}
+              max={30}
+              value={nights}
+              onChange={(e) =>
+                setNights(
+                  Math.max(1, Math.min(30, Number(e.target.value || 1)))
+                )
+              }
+              className="w-24 text-center py-2 rounded-lg border border-gray-200"
+            />
+            <div className="text-right text-sm text-gray-600">
+              Total: {(hotel.pricePerNight * nights).toFixed(2)}
+            </div>
           </div>
           <button
             onClick={handleReserveClick}

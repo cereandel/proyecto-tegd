@@ -2,12 +2,12 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { connectDB } from "@/app/lib/mongodb";
 import User from "@/app/lib/models/user.model";
-import {encrypt, getSession} from "@/app/lib/auth/auth";
+import { encrypt, getSession } from "@/app/lib/auth/auth";
 
 export async function PATCH(request: NextRequest) {
   try {
 
-    const session: any = await getSession();
+    const session: any = await getSession(request);
     const userId = session?.safeUser?.id;
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -24,9 +24,27 @@ export async function PATCH(request: NextRequest) {
 
     await connectDB();
 
+
+    const priceMap: Record<string, string> = {
+      Low: 'economic',
+      low: 'economic',
+      Lowe: 'economic',
+      Medium: 'medium',
+      medium: 'medium',
+      Expensive: 'luxury',
+      Expensivee: 'luxury',
+      Expensive_cap: 'luxury'
+    };
+
+    const normalizedPreferences = { ...preferences };
+    if (normalizedPreferences.priceRange) {
+      const pr = String(normalizedPreferences.priceRange).trim();
+      normalizedPreferences.priceRange = priceMap[pr] || pr.toLowerCase();
+    }
+
     const updated = await User.findByIdAndUpdate(
       userId,
-      { preferences },
+      { preferences: normalizedPreferences },
       { new: true }
     ).exec();
 
@@ -41,20 +59,20 @@ export async function PATCH(request: NextRequest) {
     safeUser.preferences.amenities = [...updated.preferences.amenities];
 
     const expires = new Date(safeUser.expires);
-    const newSession = await encrypt({safeUser, expires})
+    const newSession = await encrypt({ safeUser, expires })
 
-   const res =  NextResponse.json(
+    const res = NextResponse.json(
       { ok: true, preferences: updated.preferences },
       { status: 200 }
     );
-      res.cookies.set({
-          name: "session",
-          value: newSession,
-          httpOnly: true,
-          expires,
-          path: "/",
-      });
-      return res;
+    res.cookies.set({
+      name: "session",
+      value: newSession,
+      httpOnly: true,
+      expires,
+      path: "/",
+    });
+    return res;
   } catch (err) {
     console.error("Update preferences error:", err);
     return NextResponse.json(

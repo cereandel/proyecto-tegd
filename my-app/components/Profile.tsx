@@ -19,15 +19,18 @@ import { useNavigation } from "../contexts/NavigationContext";
 import { motion } from "framer-motion";
 import { useState } from "react";
 
-type SettingsView =
-  | "main"
-  | "personalInfo"
-  | "preferences";
+type SettingsView = "main" | "personalInfo" | "preferences";
 
 export function Profile({
   user,
 }: {
-  user?: { id?: string; username?: string; email?: string } | null;
+  user?: {
+    id?: string;
+    username?: string;
+    email?: string;
+    country?: string;
+    city?: string;
+  } | null;
 }) {
   const { navigateToLogin, navigateToFavorites } = useNavigation();
   const [currentView, setCurrentView] = useState<SettingsView>("main");
@@ -87,7 +90,6 @@ export function Profile({
   if (currentView === "preferences") {
     return <HotelPreferences onBack={() => setCurrentView("main")} />;
   }
-
 
   // Render main profile view
   return (

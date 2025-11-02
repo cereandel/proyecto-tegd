@@ -1,14 +1,19 @@
 "use client";
 
-import { ChevronLeft, User, Mail } from "lucide-react";
-import { useState } from "react";
+import { ChevronLeft, User, Mail, MapPin } from "lucide-react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
 interface PersonalInfoProps {
   onBack: () => void;
-  user?: { username?: string; email?: string } | null;
+  user?: {
+    username?: string;
+    email?: string;
+    country?: string;
+    city?: string;
+  } | null;
 }
 
 export function PersonalInfo({ onBack, user }: PersonalInfoProps) {
@@ -17,11 +22,25 @@ export function PersonalInfo({ onBack, user }: PersonalInfoProps) {
   const firstName = nameParts[0] || "";
   const lastName = nameParts.slice(1).join(" ") || "";
 
-  const [formData] = useState({
+  const [formData, setFormData] = useState({
     firstName: firstName || "",
     lastName: lastName || "",
     email: user?.email || "",
+    country: user?.country || "",
+    city: user?.city || "",
   });
+
+  // If the `user` prop updates after mount (e.g., session loads), sync the form data
+  useEffect(() => {
+    setFormData({
+      firstName: (user?.username || "").trim().split(/\s+/)[0] || "",
+      lastName:
+        (user?.username || "").trim().split(/\s+/).slice(1).join(" ") || "",
+      email: user?.email || "",
+      country: user?.country || "",
+      city: user?.city || "",
+    });
+  }, [user]);
 
   const inputFields = [
     {
@@ -45,6 +64,20 @@ export function PersonalInfo({ onBack, user }: PersonalInfoProps) {
       value: formData.email,
       type: "email",
       placeholder: "tu@email.com",
+    },
+    {
+      id: "country",
+      label: "País",
+      icon: MapPin,
+      value: formData.country,
+      placeholder: "País",
+    },
+    {
+      id: "city",
+      label: "Ciudad",
+      icon: MapPin,
+      value: formData.city,
+      placeholder: "Ciudad",
     },
   ];
 

@@ -28,14 +28,17 @@ export async function decrypt(input: string) {
   return payload;
 }
 
-export async function getSession() {
+export async function getSession(request?: NextRequest) {
   try {
-    const session = (await cookies()).get("session")?.value;
-    if (!session) return null;
-    return await decrypt(session);
+    const cookieVal = request
+      ? request.cookies.get("session")?.value
+      : (await cookies()).get("session")?.value;
+
+    if (!cookieVal) return null;
+    return await decrypt(cookieVal);
   } catch (err) {
     // @ts-ignore
-    console.error(err.code);
+    console.error(err?.code ?? err);
     await logOut();
     return null;
   }

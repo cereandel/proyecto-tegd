@@ -5,6 +5,13 @@ export interface IBooking extends Document {
   hotelId: mongoose.Types.ObjectId;
   checkInDate: Date;
   checkOutDate: Date;
+  nights?: number;
+  price?: number;
+  confirmationNumber?: string;
+  guestName?: string;
+  guestPhone?: string;
+  guestEmail?: string;
+  services?: string[];
 }
 
 const bookingSchema: Schema<IBooking> = new Schema(
@@ -22,6 +29,13 @@ const bookingSchema: Schema<IBooking> = new Schema(
     },
     checkInDate: { type: Date, required: true },
     checkOutDate: { type: Date, required: true },
+    nights: { type: Number },
+    price: { type: Number },
+    confirmationNumber: { type: String },
+    guestName: { type: String },
+    guestPhone: { type: String },
+    guestEmail: { type: String },
+    services: { type: [String] },
   },
   {
     timestamps: true,

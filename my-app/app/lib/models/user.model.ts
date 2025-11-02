@@ -2,28 +2,30 @@ import mongoose, { Schema, Document } from "mongoose";
 
 export interface IUser extends Document {
   name: string;
+  lastName?: string;
   email: string;
   password: string;
   city: string;
+  country: string;
   preferences: {
     hotelType: string;
     priceRange: string;
     groupSize: string;
     amenities: string[];
   };
-  recommendations:{
-      hotelType: Map<string,number>;
-      priceRange: Map<string,number>;
-      groupSize: Map<string,number>;
-      amenities: Map<string,number>;
+  recommendations: {
+    hotelType: Map<string, number>;
+    priceRange: Map<string, number>;
+    groupSize: Map<string, number>;
+    amenities: Map<string, number>;
   }
-  //bookings: mongoose.Types.ObjectId[];
   sessionToken?: string;
 }
 
 const userSchema: Schema<IUser> = new Schema(
   {
     name: { type: String, required: true, unique: true, trim: true },
+    lastName: { type: String, required: false, trim: true },
     email: {
       type: String,
       required: true,
@@ -33,21 +35,22 @@ const userSchema: Schema<IUser> = new Schema(
     },
     password: { type: String, required: true },
     city: { type: String, required: true, default: 'Miami' },
+    country: { type: String, required: true, default: 'USA' },
     sessionToken: { type: String },
     preferences: {
       hotelType: {
         type: String,
-        enum: ["Resort","", "Boutique", "Business", "Family"],
+        enum: ["Resort", "Boutique", "Business", "Family", "Hostel", "Apartment"],
         default: "Resort",
       },
       priceRange: {
         type: String,
-        enum: ["Low","", "Medium", "Expensive"],
-        default: "Medium",
+        enum: ["economic", "medium", "luxury"],
+        default: "medium",
       },
       groupSize: {
         type: String,
-        enum: ["Solo","", "Couple", "Family", "Group"],
+        enum: ["Solo", "Couple", "Family", "Group"],
         default: "Couple",
       },
       amenities: {
@@ -69,28 +72,28 @@ const userSchema: Schema<IUser> = new Schema(
       },
     },
 
-      recommendations: {
-          hotelType: {
-              type: Map,
-              of: Number,
-              default: new Map()
-          },
-          priceRange: {
-              type: Map,
-              of: Number,
-              default: new Map()
-          },
-          groupSize: {
-              type: Map,
-              of: Number,
-              default: new Map()
-          },
-          amenities: {
-              type: Map,
-              of: Number,
-              default: new Map()
-          },
+    recommendations: {
+      hotelType: {
+        type: Map,
+        of: Number,
+        default: new Map()
       },
+      priceRange: {
+        type: Map,
+        of: Number,
+        default: new Map()
+      },
+      groupSize: {
+        type: Map,
+        of: Number,
+        default: new Map()
+      },
+      amenities: {
+        type: Map,
+        of: Number,
+        default: new Map()
+      },
+    },
     /* bookings: [
       {
         type: Schema.Types.ObjectId,

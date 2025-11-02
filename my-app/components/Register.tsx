@@ -23,8 +23,24 @@ export function Register({ onNavigateToLogin, onRegister }: RegisterProps) {
     name: "",
     email: "",
     password: "",
+    country: "",
+    city: "",
     confirmPassword: "",
   });
+
+  const countries = [
+    { country: "Estados Unidos", city: "Washington, D.C." },
+    { country: "México", city: "Ciudad de México" },
+    { country: "España", city: "Madrid" },
+    { country: "Reino Unido", city: "Londres" },
+    { country: "Francia", city: "París" },
+    { country: "Alemania", city: "Berlín" },
+    { country: "Italia", city: "Roma" },
+    { country: "Canadá", city: "Ottawa" },
+    { country: "Brasil", city: "Brasilia" },
+    { country: "Argentina", city: "Buenos Aires" },
+    { country: "Japón", city: "Tokio" },
+  ];
 
   const validateName = (name: string) => {
     const parts = name.trim().split(/\s+/);
@@ -72,6 +88,8 @@ export function Register({ onNavigateToLogin, onRegister }: RegisterProps) {
             name: formData.name,
             email: formData.email,
             password: formData.password,
+            country: formData.country,
+            city: formData.city,
           }),
         });
 
@@ -292,7 +310,36 @@ export function Register({ onNavigateToLogin, onRegister }: RegisterProps) {
               )}
             </div>
 
-            <div className="mb-6" />
+            {/* Country select paired with capital city */}
+            <div className="mb-6">
+              <label className="block mb-2 text-gray-700">País</label>
+              <div className="relative">
+                <select
+                  value={formData.country}
+                  onChange={(e) => {
+                    const selected = countries.find(
+                      (c) => c.country === e.target.value
+                    );
+                    handleChange("country", e.target.value);
+                    handleChange("city", selected ? selected.city : "");
+                  }}
+                  className="w-full pl-4 pr-6 py-4 bg-gray-50 border-none outline-none transition-all focus:bg-white focus:shadow-md"
+                  style={{ borderRadius: "24px" }}
+                >
+                  <option value="">Selecciona un país</option>
+                  {countries.map((c) => (
+                    <option key={c.country} value={c.country}>
+                      {c.country} — {c.city}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {formData.city && (
+                <p className="text-sm mt-2 ml-2 text-gray-600">
+                  Capital seleccionada: {formData.city}
+                </p>
+              )}
+            </div>
 
             {/* Register Button */}
             <button

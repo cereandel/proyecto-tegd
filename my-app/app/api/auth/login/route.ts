@@ -51,11 +51,14 @@ export async function POST(request: NextRequest) {
       username: user.name,
       email: user.email,
       preferences: {
-          hotelType: user.preferences.hotelType,
-          priceRange: user.preferences.priceRange,
-          groupSize: user.preferences.groupSize,
-          amenities: [...user.preferences.amenities]
+        hotelType: user.preferences.hotelType,
+        priceRange: user.preferences.priceRange,
+        groupSize: user.preferences.groupSize,
+        amenities: [...user.preferences.amenities]
       }
+      ,
+      country: (user as any).country,
+      city: (user as any).city,
     };
 
     const expires = new Date(Date.now() + 60 * 60 * 1000);

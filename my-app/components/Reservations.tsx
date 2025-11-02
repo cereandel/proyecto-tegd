@@ -41,11 +41,17 @@ interface Reservation {
   images?: { main?: string; others?: string[] } | string[];
   checkIn: string;
   checkOut: string;
+  checkInFull?: string;
+  checkOutFull?: string;
   confirmationNumber: string;
   status: "upcoming" | "completed";
   nights: number;
   price: string;
   tags?: { label: string; color: string }[];
+  _guest?: { name?: string; phone?: string; email?: string };
+  services?: string[];
+  _hotel?: any;
+  _priceNumber?: number;
 }
 
 const allHotelTags = [
@@ -93,24 +99,51 @@ export function Reservations() {
               ? r.hotel?.images[0]
               : (r.hotel?.images as any)?.main) ??
             "",
+          _hotel: r.hotel ?? null,
           checkIn: r.checkInDate
-            ? new Date(r.checkInDate).toLocaleDateString()
+            ? new Date(r.checkInDate).toLocaleDateString("es-ES", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })
             : "",
           checkOut: r.checkOutDate
-            ? new Date(r.checkOutDate).toLocaleDateString()
+            ? new Date(r.checkOutDate).toLocaleDateString("es-ES", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })
+            : "",
+          checkInFull: r.checkInDate
+            ? new Date(r.checkInDate).toLocaleString()
+            : "",
+          checkOutFull: r.checkOutDate
+            ? new Date(r.checkOutDate).toLocaleString()
             : "",
           confirmationNumber: r.confirmationNumber ?? "",
           status: "upcoming",
           nights:
-            r.checkInDate && r.checkOutDate
+            typeof r.nights === "number"
+              ? r.nights
+              : r.checkInDate && r.checkOutDate
               ? Math.ceil(
                   (new Date(r.checkOutDate).getTime() -
                     new Date(r.checkInDate).getTime()) /
                     (1000 * 60 * 60 * 24)
                 )
               : 0,
-          price: r.price ?? "",
+          _priceNumber: typeof r.price === "number" ? r.price : undefined,
+          price:
+            typeof r.price === "number"
+              ? `$${r.price.toFixed(2)}`
+              : r.price ?? "",
           tags: getHotelTags(r.hotelId ?? 1),
+          _guest: {
+            name: r.guestName ?? r.user?.name ?? "",
+            phone: r.guestPhone ?? r.user?.phone ?? "",
+            email: r.guestEmail ?? r.user?.email ?? "",
+          },
+          services: Array.isArray(r.services) ? r.services : [],
         }));
         setUpcomingReservations(mapped);
       })
@@ -127,7 +160,6 @@ export function Reservations() {
   };
 
   React.useEffect(() => {
-
     fetch(`/api/bookings/history`)
       .then((res) => res.json())
       .then((data) => {
@@ -143,26 +175,53 @@ export function Reservations() {
               ? r.hotel?.images[0]
               : (r.hotel?.images as any)?.main) ??
             "",
+          _hotel: r.hotel ?? null,
           checkIn: r.checkInDate
-            ? new Date(r.checkInDate).toLocaleDateString()
+            ? new Date(r.checkInDate).toLocaleDateString("es-ES", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })
             : "",
           checkOut: r.checkOutDate
-            ? new Date(r.checkOutDate).toLocaleDateString()
+            ? new Date(r.checkOutDate).toLocaleDateString("es-ES", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })
+            : "",
+          checkInFull: r.checkInDate
+            ? new Date(r.checkInDate).toLocaleString()
+            : "",
+          checkOutFull: r.checkOutDate
+            ? new Date(r.checkOutDate).toLocaleString()
             : "",
           confirmationNumber: r.confirmationNumber ?? "",
           status: "completed",
           nights:
-            r.checkInDate && r.checkOutDate
+            typeof r.nights === "number"
+              ? r.nights
+              : r.checkInDate && r.checkOutDate
               ? Math.ceil(
                   (new Date(r.checkOutDate).getTime() -
                     new Date(r.checkInDate).getTime()) /
                     (1000 * 60 * 60 * 24)
                 )
               : 0,
-          price: r.price ?? "",
+          _priceNumber: typeof r.price === "number" ? r.price : undefined,
+          price:
+            typeof r.price === "number"
+              ? `$${r.price.toFixed(2)}`
+              : r.price ?? "",
           tags: getHotelTags(
             r.hotelId ?? (r.hotel?._id ? Number(r.hotel._id) : 1)
           ),
+          _guest: {
+            name: r.guestName ?? r.user?.name ?? "",
+            phone: r.guestPhone ?? r.user?.phone ?? "",
+            email: r.guestEmail ?? r.user?.email ?? "",
+          },
+          services: Array.isArray(r.services) ? r.services : [],
         }));
         setPastReservations(mapped);
       })
@@ -311,7 +370,6 @@ export function Reservations() {
   );
 }
 
-
 function ReservationCard({
   reservation,
   isUpcoming,
@@ -340,7 +398,6 @@ function ReservationCard({
         setIsCanceling(false);
 
         if (!res.ok) {
-
           setShowCancelError(true);
           setTimeout(() => {
             setShowCancelError(false);
@@ -348,7 +405,6 @@ function ReservationCard({
           }, 3000);
           return;
         }
-
 
         setIsCanceled(true);
         setTimeout(() => {
@@ -683,16 +739,14 @@ function ReservationCard({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <p className="text-xs text-gray-600 mb-1">Check-in</p>
-                  <p className="text-gray-900">{reservation.checkIn}</p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    A partir de las 3:00 PM
+                  <p className="text-gray-900">
+                    {reservation.checkInFull || reservation.checkIn}
                   </p>
                 </div>
                 <div>
                   <p className="text-xs text-gray-600 mb-1">Check-out</p>
-                  <p className="text-gray-900">{reservation.checkOut}</p>
-                  <p className="text-xs text-gray-500 mt-1">
-                    Hasta las 11:00 AM
+                  <p className="text-gray-900">
+                    {reservation.checkOutFull || reservation.checkOut}
                   </p>
                 </div>
               </div>
@@ -713,41 +767,58 @@ function ReservationCard({
               }}
             >
               <h4 className="text-gray-900">Información del Huésped</h4>
-              <div className="flex items-center gap-2 text-gray-600">
-                <Users size={16} />
-                <span className="text-sm">2 Adultos</span>
-              </div>
-              <div className="flex items-center gap-2 text-gray-600">
-                <Phone size={16} />
-                <span className="text-sm">+1 (555) 123-4567</span>
-              </div>
-              <div className="flex items-center gap-2 text-gray-600">
-                <Mail size={16} />
-                <span className="text-sm">guest@example.com</span>
-              </div>
+              {reservation._guest?.name ? (
+                <div className="flex items-center gap-2 text-gray-600">
+                  <Users size={16} />
+                  <span className="text-sm">{reservation._guest.name}</span>
+                </div>
+              ) : null}
+              {reservation._guest?.phone ? (
+                <div className="flex items-center gap-2 text-gray-600">
+                  <Phone size={16} />
+                  <span className="text-sm">{reservation._guest.phone}</span>
+                </div>
+              ) : null}
+              {reservation._guest?.email ? (
+                <div className="flex items-center gap-2 text-gray-600">
+                  <Mail size={16} />
+                  <span className="text-sm">{reservation._guest.email}</span>
+                </div>
+              ) : null}
             </div>
 
             {/* Amenities */}
             <div>
-              <h4 className="text-gray-900 mb-3">Servicios Incluidos</h4>
-              <div className="grid grid-cols-2 gap-3">
-                <div className="flex items-center gap-2 text-gray-600">
-                  <Wifi size={16} style={{ color: "#007AFF" }} />
-                  <span className="text-sm">WiFi Gratis</span>
+              <h4 className="text-gray-900 mb-3">Servicios Seleccionados</h4>
+              {reservation.services && reservation.services.length > 0 ? (
+                <div className="grid grid-cols-1 gap-2">
+                  {reservation.services.map((s, i) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-2 text-gray-600"
+                    >
+                      <Check size={16} style={{ color: "#007AFF" }} />
+                      <span className="text-sm">{s}</span>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex items-center gap-2 text-gray-600">
-                  <Coffee size={16} style={{ color: "#007AFF" }} />
-                  <span className="text-sm">Desayuno</span>
+              ) : reservation._hotel && reservation._hotel.amenities ? (
+                <div className="grid grid-cols-1 gap-2">
+                  {reservation._hotel.amenities.map((s: any, i: number) => (
+                    <div
+                      key={i}
+                      className="flex items-center gap-2 text-gray-600"
+                    >
+                      <Check size={16} style={{ color: "#007AFF" }} />
+                      <span className="text-sm">{String(s)}</span>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex items-center gap-2 text-gray-600">
-                  <Dumbbell size={16} style={{ color: "#007AFF" }} />
-                  <span className="text-sm">Gimnasio</span>
-                </div>
-                <div className="flex items-center gap-2 text-gray-600">
-                  <CreditCard size={16} style={{ color: "#007AFF" }} />
-                  <span className="text-sm">Estacionamiento</span>
-                </div>
-              </div>
+              ) : (
+                <p className="text-sm text-gray-500">
+                  No se seleccionaron servicios
+                </p>
+              )}
             </div>
 
             {/* Price Summary */}
@@ -765,7 +836,18 @@ function ReservationCard({
                     Incluye impuestos y cargos
                   </p>
                 </div>
-                <p className="text-2xl text-white">{reservation.price}</p>
+                <p className="text-2xl text-white">
+                  {reservation.price
+                    ? reservation.price
+                    : reservation._priceNumber
+                    ? `$${reservation._priceNumber.toFixed(2)}`
+                    : reservation._hotel &&
+                      typeof reservation._hotel.pricePerNight === "number"
+                    ? `$${(
+                        reservation._hotel.pricePerNight * reservation.nights
+                      ).toFixed(2)}`
+                    : ""}
+                </p>
               </div>
             </div>
           </div>

@@ -2,12 +2,11 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { connectDB } from "@/app/lib/mongodb";
 import User from "@/app/lib/models/user.model";
-import { generateSHA256Hash } from "@/app/lib/auth/auth";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, password, preferences } = body || {};
+    const { name, email, password, preferences, country, city } = body || {};
 
     if (!name || !email || !password) {
       return NextResponse.json(
@@ -27,12 +26,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const hashed = await generateSHA256Hash(password);
-
     const createPayload: any = {
       name,
       email,
-      password: hashed,
+      password: password,
+      country,
+      city,
     };
     if (preferences && typeof preferences === "object") {
       createPayload.preferences = preferences;
@@ -47,6 +46,8 @@ export async function POST(request: NextRequest) {
           id: created._id,
           name: created.name,
           email: created.email,
+          country: created.country,
+          city: created.city,
           preferences: created.preferences,
         },
       },

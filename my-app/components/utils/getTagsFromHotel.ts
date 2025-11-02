@@ -1,9 +1,7 @@
 export type Tag = { label: string; color: string };
 
-// mapeo de colores para las opciones que aparecen en el seed
 const COLOR_MAP: Record<string, string> = {
     Resort: "#007AFF",
-    Playa: "#5AC8FA",
     Beach: "#5AC8FA",
     Family: "#34C759",
     Couple: "#FF2D55",
@@ -11,6 +9,17 @@ const COLOR_MAP: Record<string, string> = {
     Modern: "#34C759",
     Boutique: "#FF9500",
     Luxury: "#AF52DE",
+    Playa: "#5AC8FA",
+
+    Familia: "#34C759",
+    Pareja: "#FF2D55",
+    Negocios: "#AF52DE",
+    Moderno: "#34C759",
+    Moderna: "#34C759",
+    Lujo: "#AF52DE",
+
+    "Beach Resort": "#007AFF",
+    "Family-Friendly": "#34C759",
 };
 
 function normalizeLabel(s: any) {

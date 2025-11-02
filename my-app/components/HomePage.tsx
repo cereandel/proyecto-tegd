@@ -9,7 +9,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Plane, MapPin, Hotel, Globe, Search } from "lucide-react";
 import { useNavigation } from "../contexts/NavigationContext";
 import { useSelectedHotel } from "../contexts/SelectedHotelContext";
-import { getMockHotels } from "../data/mocks/hotels";
 import { useViewAll } from "../contexts/ViewAllContext";
 import { useViewAllLocations } from "../contexts/ViewAllLocationsContext";
 
@@ -47,21 +46,25 @@ export function HomePage({
     navigateTo(`hotelDetails/${hotel._id}`);
   };
 
-  const [popularHotels,setPopularHotels] = useState()
-  const [recommendedHotels,setRecommendedHotels] = useState()
+  const [popularHotels, setPopularHotels] = useState<any[] | undefined>();
+  const [recommendedHotels, setRecommendedHotels] = useState<
+    any[] | undefined
+  >();
 
-  async function getAllHoteles(){
-      const response = await fetch(`/api/hotels`, {
-          method: "GET",
-          headers: {"Content-Type": "application/json"},
-      });
-      if (response.ok) {
-          const res = await response.json();
-          setPopularHotels(res.data);
-          setRecommendedHotels(res.recommended);
-      } else {
-          console.log('error al recibir cookie')
-      }
+  async function getAllHoteles() {
+    const response = await fetch(`/api/hotels`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    if (response.ok) {
+      const res = await response.json();
+      setPopularHotels(res.data || []);
+      setRecommendedHotels(
+        Array.isArray(res.recommended) ? res.recommended : []
+      );
+    } else {
+      // keep the original behavior; no debug logging
+    }
   }
 
   // Handle openSearchOnMount changes
@@ -85,7 +88,7 @@ export function HomePage({
 
   // Register a handler so BottomNav's search button expands the search bar on this screen
   useEffect(() => {
-      getAllHoteles();
+    getAllHoteles();
 
     const handler = () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -175,8 +178,6 @@ export function HomePage({
         "https://images.unsplash.com/photo-1709744873177-714d7ab0fe02?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb2FzdGFsJTIwaG90ZWwlMjB2aWV3fGVufDF8fHx8MTc2MDk3ODQ1MHww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
     },
   ];
-
-
 
   return (
     <div className="min-h-screen bg-white pb-24">
@@ -424,33 +425,38 @@ export function HomePage({
         </div>
       </div>
 
-        {recommendedHotels && (
+      {
+        // Always render the carousel; pass an empty array when there are no recommendations
+      }
       <HotelCarousel
         title="Tus Recomendaciones Destacadas"
-        hotels={recommendedHotels}
+        hotels={recommendedHotels ?? []}
         featured={true}
         onViewAll={() => {
-          setViewAll("Tus Recomendaciones Destacadas", recommendedHotels);
+          setViewAll("Tus Recomendaciones Destacadas", recommendedHotels ?? []);
           navigateTo("viewAll");
-          onViewAllHotels?.("Tus Recomendaciones Destacadas", recommendedHotels);
+          onViewAllHotels?.(
+            "Tus Recomendaciones Destacadas",
+            recommendedHotels ?? []
+          );
         }}
         onHotelClick={handleHotelClick}
       />
-        )}
-        {/*Popular Hotels Carousel*/}
+
+      {/*Popular Hotels Carousel*/}
       {popularHotels && (
-      <HotelCarousel
-        title="Hoteles Populares"
-        hotels={popularHotels}
-        onViewAll={() => {
-          setViewAll("Hoteles Populares", popularHotels);
-          navigateTo("viewAll");
-          onViewAllHotels?.("Hoteles Populares", popularHotels);
-        }}
-        onHotelClick={handleHotelClick}
-      />
-        )}
-        {/* Bottom Navigation */}
+        <HotelCarousel
+          title="Hoteles Populares"
+          hotels={popularHotels}
+          onViewAll={() => {
+            setViewAll("Hoteles Populares", popularHotels);
+            navigateTo("viewAll");
+            onViewAllHotels?.("Hoteles Populares", popularHotels);
+          }}
+          onHotelClick={handleHotelClick}
+        />
+      )}
+      {/* Bottom Navigation */}
       <BottomNav activeTab={isSearchExpanded ? "search" : "home"} />
     </div>
   );
