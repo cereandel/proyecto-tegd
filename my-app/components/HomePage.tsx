@@ -90,6 +90,12 @@ export function HomePage({
   useEffect(() => {
     getAllHoteles();
 
+    const onPreferencesUpdated = () => {
+      // re-fetch hotels so recommendations reflect new preferences
+      getAllHoteles();
+    };
+    window.addEventListener("preferences:updated", onPreferencesUpdated);
+
     const handler = () => {
       window.scrollTo({ top: 0, behavior: "smooth" });
       setIsSearchExpanded(true);
@@ -101,6 +107,7 @@ export function HomePage({
     return () => {
       // cleanup when leaving the home screen
       setBottomSearchHandler?.(undefined);
+      window.removeEventListener("preferences:updated", onPreferencesUpdated);
     };
   }, []);
 

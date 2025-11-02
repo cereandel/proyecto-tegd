@@ -84,10 +84,11 @@ export async function getRecommendedHoteles(user: IUser | null | undefined) {
     Array.from(map.values()).every(score => score < 5)
   );
 
-  const hasPreferences = user.preferences?.hotelType ||
-    user.preferences?.priceRange ||
-    user.preferences?.groupSize ||
-    (user.preferences?.amenities && user.preferences.amenities.length > 0)
+  const prefs = (user.preferences ?? {}) as Partial<IUser['preferences']>;
+  const hasPreferences = (prefs?.hotelType && prefs.hotelType.length > 0) ||
+    (prefs?.priceRange && prefs.priceRange.length > 0) ||
+    (prefs?.groupSize && prefs.groupSize.length > 0) ||
+    (Array.isArray(prefs?.amenities) && (prefs.amenities ?? []).length > 0)
 
   if (hasPreferences) {
     return await getRecommendedHotelesPreferencias(user)
@@ -132,18 +133,19 @@ export async function getRecommendedHotelesLocation(user: IUser) {
 
 export async function getRecommendedHotelesPreferencias(user: IUser) {
   const query: FilterQuery<IHotel> = {};
+  const prefs = (user.preferences ?? {}) as Partial<IUser['preferences']>;
 
-  if (user.preferences.hotelType) {
-    query.hotelType = user.preferences.hotelType;
+  if (prefs?.hotelType) {
+    query.hotelType = prefs.hotelType;
   }
-  if (user.preferences.priceRange) {
-    query.priceRange = user.preferences.priceRange;
+  if (prefs?.priceRange) {
+    query.priceRange = prefs.priceRange;
   }
-  if (user.preferences.groupSize) {
-    query.groupSize = user.preferences.groupSize;
+  if (prefs?.groupSize) {
+    query.groupSize = prefs.groupSize;
   }
-  if (user.preferences.amenities && user.preferences.amenities.length > 0) {
-    query.amenities = { $all: user.preferences.amenities };
+  if (Array.isArray(prefs?.amenities) && (prefs.amenities ?? []).length > 0) {
+    query.amenities = { $all: prefs.amenities } as any;
   }
 
   const hotels = await Hotel.find(query).sort({ averageRating: -1 }).exec();
@@ -152,11 +154,11 @@ export async function getRecommendedHotelesPreferencias(user: IUser) {
   try {
     const explanations = hotels.map((h) => {
       const reasons: string[] = [];
-      if (user.preferences.hotelType && h.hotelType === user.preferences.hotelType) reasons.push(`hotelType=${h.hotelType}`);
-      if (user.preferences.priceRange && h.priceRange === user.preferences.priceRange) reasons.push(`priceRange=${h.priceRange}`);
-      if (user.preferences.groupSize && h.groupSize === user.preferences.groupSize) reasons.push(`groupSize=${h.groupSize}`);
-      if (Array.isArray(user.preferences.amenities) && user.preferences.amenities.length > 0) {
-        const matched = user.preferences.amenities.filter(a => Array.isArray(h.amenities) && h.amenities.includes(a));
+      if (prefs?.hotelType && h.hotelType === prefs.hotelType) reasons.push(`hotelType=${h.hotelType}`);
+      if (prefs?.priceRange && h.priceRange === prefs.priceRange) reasons.push(`priceRange=${h.priceRange}`);
+      if (prefs?.groupSize && h.groupSize === prefs.groupSize) reasons.push(`groupSize=${h.groupSize}`);
+      if (Array.isArray(prefs?.amenities) && (prefs.amenities ?? []).length > 0) {
+        const matched = (prefs.amenities ?? []).filter(a => Array.isArray(h.amenities) && h.amenities.includes(a));
         if (matched.length > 0) reasons.push(`amenities=[${matched.join(',')}]`);
       }
       return { name: h.name || h._id, reasons };

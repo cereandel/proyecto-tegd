@@ -7,12 +7,12 @@ export interface IUser extends Document {
   password: string;
   city: string;
   country: string;
-  preferences: {
+  preferences?: {
     hotelType: string;
     priceRange: string;
     groupSize: string;
     amenities: string[];
-  };
+  } | null;
   recommendations: {
     hotelType: Map<string, number>;
     priceRange: Map<string, number>;
@@ -38,38 +38,33 @@ const userSchema: Schema<IUser> = new Schema(
     country: { type: String, required: true, default: 'USA' },
     sessionToken: { type: String },
     preferences: {
-      hotelType: {
-        type: String,
-        enum: ["Resort", "Boutique", "Business", "Family", "Hostel", "Apartment"],
-        default: "Resort",
-      },
-      priceRange: {
-        type: String,
-        enum: ["economic", "medium", "luxury"],
-        default: "medium",
-      },
-      groupSize: {
-        type: String,
-        enum: ["Solo", "Couple", "Family", "Group"],
-        default: "Couple",
-      },
-      amenities: {
-        type: [String],
-        enum: [
-          "wifi",
-          "breakfast",
-          "gym",
-          "pool",
-          "parking",
-          "free-wifi",
-          "conference-room",
-          "beach-access",
-          "spa",
-          "bar",
-          "room-service",
-        ],
-        default: ["wifi", "breakfast"],
-      },
+      type: new Schema(
+        {
+          hotelType: {
+            type: String,
+            enum: ["Resort", "Boutique", "Business", "Family", "Hostel", "Apartment"],
+          },
+          priceRange: {
+            type: String,
+            enum: ["economic", "medium", "luxury"],
+          },
+          groupSize: {
+            type: String,
+            enum: ["Solo", "Couple", "Family", "Group"],
+          },
+          amenities: {
+            type: [String],
+            enum: [
+              "wifi",
+              "breakfast",
+              "gym",
+              "pool",
+            ],
+          },
+        },
+        { _id: false }
+      ),
+      default: null,
     },
 
     recommendations: {

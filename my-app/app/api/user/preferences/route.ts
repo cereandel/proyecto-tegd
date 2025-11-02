@@ -42,6 +42,12 @@ export async function PATCH(request: NextRequest) {
       normalizedPreferences.priceRange = priceMap[pr] || pr.toLowerCase();
     }
 
+    if (Object.prototype.hasOwnProperty.call(normalizedPreferences, 'amenities')) {
+      normalizedPreferences.amenities = Array.isArray(normalizedPreferences.amenities)
+        ? normalizedPreferences.amenities
+        : [];
+    }
+
     const updated = await User.findByIdAndUpdate(
       userId,
       { preferences: normalizedPreferences },

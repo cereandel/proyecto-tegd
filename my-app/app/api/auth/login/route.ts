@@ -45,18 +45,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const prefs = (user as any).preferences ?? null;
     const safeUser = {
       // @ts-ignore
       id: user._id.toString(),
       username: user.name,
       email: user.email,
       preferences: {
-        hotelType: user.preferences.hotelType,
-        priceRange: user.preferences.priceRange,
-        groupSize: user.preferences.groupSize,
-        amenities: [...user.preferences.amenities]
-      }
-      ,
+        hotelType: prefs?.hotelType ?? "",
+        priceRange: prefs?.priceRange ?? "",
+        groupSize: prefs?.groupSize ?? "",
+        amenities: Array.isArray(prefs?.amenities) ? [...prefs.amenities] : [],
+      },
       country: (user as any).country,
       city: (user as any).city,
     };

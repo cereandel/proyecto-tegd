@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
       country,
       city,
     };
-    if (preferences && typeof preferences === "object") {
+    if (preferences && typeof preferences === "object" && Object.keys(preferences).length > 0) {
       createPayload.preferences = preferences;
     }
 

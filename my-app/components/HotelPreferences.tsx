@@ -15,11 +15,11 @@ import {
   Check,
   XCircle,
 } from "lucide-react";
-import {useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {cookies} from "next/headers";
+import { cookies } from "next/headers";
 import hotelModel from "@/app/lib/models/hotel.model";
-import {getSocketUrl} from "next/dist/client/components/react-dev-overlay/internal/helpers/get-socket-url";
+import { getSocketUrl } from "next/dist/client/components/react-dev-overlay/internal/helpers/get-socket-url";
 
 interface HotelPreferencesProps {
   onBack: () => void;
@@ -33,23 +33,24 @@ export function HotelPreferences({ onBack }: HotelPreferencesProps) {
     amenities: [] as string[],
   });
 
-  async function getUserPreferences(){
-      const response = await fetch(`/api/session`, {
-          method: "GET",
-          headers: {"Content-Type": "application/json"},
-      });
-      if (response.ok) {
-          const res = await response.json();
-          setPreferences((prev) => ({
-              ...prev,
-              hotelType: res.session.safeUser.preferences.hotelType,
-              priceRange: res.session.safeUser.preferences.priceRange,
-              groupSize: res.session.safeUser.preferences.groupSize,
-              amenities: res.session.safeUser.preferences.amenities,
-          }));
-      } else {
-          console.log('error al recibir cookie')
-      }
+  async function getUserPreferences() {
+    const response = await fetch(`/api/session`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    if (response.ok) {
+      const res = await response.json();
+      const prefs = res.session?.safeUser?.preferences ?? null;
+      setPreferences((prev) => ({
+        ...prev,
+        hotelType: prefs?.hotelType ?? "",
+        priceRange: prefs?.priceRange ?? "",
+        groupSize: prefs?.groupSize ?? "",
+        amenities: Array.isArray(prefs?.amenities) ? prefs!.amenities : [],
+      }));
+    } else {
+      console.log("error al recibir cookie");
+    }
   }
 
   const [showSaveAnimation, setShowSaveAnimation] = useState(false);
@@ -59,10 +60,27 @@ export function HotelPreferences({ onBack }: HotelPreferencesProps) {
     (async () => {
       try {
         setShowSaveAnimation(true);
+        const mapPrice = (p: string) => {
+          if (!p) return p;
+          const lower = p.toLowerCase();
+          if (lower === "low" || lower === "económico" || lower === "economico")
+            return "economic";
+          if (lower === "medium" || lower === "medio") return "medium";
+          if (lower === "expensive" || lower === "lujo") return "luxury";
+          if (lower === "economic" || lower === "medium" || lower === "luxury")
+            return lower;
+          return p;
+        };
+
+        const normalizedPreferences = {
+          ...preferences,
+          priceRange: mapPrice(preferences.priceRange),
+        };
+
         const resp = await fetch("/api/user/preferences", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ preferences }),
+          body: JSON.stringify({ preferences: normalizedPreferences }),
         });
         const data = await resp.json();
         setTimeout(() => setShowSaveAnimation(false), 700);
@@ -73,13 +91,23 @@ export function HotelPreferences({ onBack }: HotelPreferencesProps) {
           return;
         }
         if (data?.preferences) {
-            setPreferences((prev) => ({
-                ...prev,
-                hotelType: data.preferences.hotelType,
-                priceRange: data.preferences.priceRange,
-                groupSize: data.preferences.groupSize,
-                amenities: data.preferences.amenities,
-            }));
+          setPreferences((prev) => ({
+            ...prev,
+            hotelType: data.preferences.hotelType,
+            priceRange: data.preferences.priceRange,
+            groupSize: data.preferences.groupSize,
+            amenities: data.preferences.amenities,
+          }));
+          // notify other parts of the app (HomePage) that preferences changed
+          try {
+            window.dispatchEvent(
+              new CustomEvent("preferences:updated", {
+                detail: { preferences: data.preferences },
+              })
+            );
+          } catch (e) {
+            // ignore in non-browser environments
+          }
         }
       } catch (err) {
         console.error("Save preferences error:", err);
@@ -96,12 +124,14 @@ export function HotelPreferences({ onBack }: HotelPreferencesProps) {
     { id: "Boutique", label: "Boutique", icon: Home, color: "#5856D6" },
     { id: "Business", label: "Negocios", icon: Wind, color: "#007AFF" },
     { id: "Family", label: "Familiar", icon: Users, color: "#34C759" },
+    { id: "Hostel", label: "Hostel", icon: Sparkles, color: "#FFCC00" },
+    { id: "Apartment", label: "Apartamento", icon: Home, color: "#00C2A8" },
   ];
 
   const priceRanges = [
-    { id: "Low", label: "Económico", range: "< $100", color: "#34C759" },
-    { id: "Medium", label: "Medio", range: "$100 - $250", color: "#FF9500" },
-    { id: "Expensive", label: "Lujo", range: "> $250", color: "#AF52DE" },
+    { id: "economic", label: "Económico", range: "< $100", color: "#34C759" },
+    { id: "medium", label: "Medio", range: "$100 - $250", color: "#FF9500" },
+    { id: "luxury", label: "Lujo", range: "> $250", color: "#AF52DE" },
   ];
 
   const groupSizes = [
@@ -116,34 +146,27 @@ export function HotelPreferences({ onBack }: HotelPreferencesProps) {
     { id: "breakfast", label: "Desayuno", icon: Coffee },
     { id: "gym", label: "Gimnasio", icon: Dumbbell },
     { id: "pool", label: "Piscina", icon: Waves },
-    { id: "parking", label: "Estacionamiento", icon: Car },
   ];
 
   const toggleHotelType = (id: string) => {
     setPreferences((prev) => ({
       ...prev,
-      hotelType: prev.hotelType == id
-        ? ''
-        : id,
+      hotelType: prev.hotelType == id ? "" : id,
     }));
   };
 
   const toggleAmenity = (id: string) => {
     setPreferences((prev) => ({
-        ...prev,
-        amenities: prev.amenities.includes(id)
+      ...prev,
+      amenities: prev.amenities.includes(id)
         ? prev.amenities.filter((a) => a !== id)
         : [...prev.amenities, id],
     }));
   };
 
-
-    useEffect(() => {
-        getUserPreferences();
-
-    }, []);
-
-
+  useEffect(() => {
+    getUserPreferences();
+  }, []);
 
   return (
     <div
@@ -229,7 +252,10 @@ export function HotelPreferences({ onBack }: HotelPreferencesProps) {
                 <motion.button
                   key={range.id}
                   onClick={() =>
-                    setPreferences({ ...preferences, priceRange: range.id })
+                    setPreferences((prev) => ({
+                      ...prev,
+                      priceRange: prev.priceRange === range.id ? "" : range.id,
+                    }))
                   }
                   className="w-full p-4 flex items-center justify-between transition-all"
                   style={{
@@ -301,7 +327,10 @@ export function HotelPreferences({ onBack }: HotelPreferencesProps) {
                 <motion.button
                   key={size.id}
                   onClick={() =>
-                    setPreferences({ ...preferences, groupSize: size.id })
+                    setPreferences((prev) => ({
+                      ...prev,
+                      groupSize: prev.groupSize === size.id ? "" : size.id,
+                    }))
                   }
                   className="p-3 flex flex-col items-center gap-2 transition-all"
                   style={{
@@ -341,7 +370,9 @@ export function HotelPreferences({ onBack }: HotelPreferencesProps) {
           </h2>
           <div className="grid grid-cols-2 gap-3">
             {amenities.map((amenity, index) => {
-              const isSelected = preferences.amenities.includes(amenity.id);
+              const isSelected =
+                Array.isArray(preferences.amenities) &&
+                preferences.amenities.includes(amenity.id);
               return (
                 <motion.button
                   key={amenity.id}
