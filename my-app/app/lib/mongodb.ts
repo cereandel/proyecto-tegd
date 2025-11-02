@@ -210,7 +210,9 @@ export async function fillRecommendations(user: IUser, hotel: IHotel) {
       } else {
         user.recommendations.amenities.set(amenitie, 1);
       }
+
     });
+    await user.save()
   } catch (error) {
     console.error("Error disconnecting MongoDB:", error);
   }
