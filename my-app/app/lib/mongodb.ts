@@ -189,8 +189,8 @@ export async function getRecommendedHotelesTipo(user: IUser) {
     .filter(([type, score]) => score >= 5)
     .sort((a, b) => b[1] - a[1]);
   const typesToQuery = sortedRecommendedTypes.slice(0, 3).map(([type, score]) => type);
-  const groupsToQuery = sortedRecommendedGroups.slice(0, 3).map(([type, score]) => type);
-  const pricesToQuery = sortedRecommendedPrices.slice(0, 3).map(([type, score]) => type);
+  const groupsToQuery = sortedRecommendedGroups.slice(0, 2).map(([type, score]) => type);
+  const pricesToQuery = sortedRecommendedPrices.slice(0, 1).map(([type, score]) => type);
 
   if (typesToQuery.length > 0) {
     query.hotelType = typesToQuery;
