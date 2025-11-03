@@ -42,15 +42,15 @@ const userSchema: Schema<IUser> = new Schema(
         {
           hotelType: {
             type: String,
-            enum: ["Resort", "Boutique", "Business", "Family", "Hostel", "Apartment"],
+            enum: ["Resort","", "Boutique", "Business", "Family", "Hostel", "Apartment"],
           },
           priceRange: {
             type: String,
-            enum: ["economic", "medium", "luxury"],
+            enum: ["economic","", "medium", "luxury"],
           },
           groupSize: {
             type: String,
-            enum: ["Solo", "Couple", "Family", "Group"],
+            enum: ["Solo","", "Couple", "Family", "Group"],
           },
           amenities: {
             type: [String],
